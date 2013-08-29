@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+
+	<display-name>xdi2-mongodb</display-name>
+
+	<!-- WEB INTERFACE -->
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<servlet>
+		<servlet-name>XDIMongoDB</servlet-name>
+		<servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>XDIMongoDB</servlet-name>
+		<url-pattern>/XDIMongoDB</url-pattern>
+	</servlet-mapping>
+
+	<!-- XDI SERVLET -->
+
+	<servlet>
+		<servlet-name>EndpointServlet</servlet-name>
+		<servlet-class>xdi2.server.servlet.EndpointServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>EndpointServlet</servlet-name>
+		<url-pattern>/xdi/*</url-pattern>
+		<url-pattern>/xdi/</url-pattern>
+	</servlet-mapping>
+
+	<!-- LISTENERS -->
+
+	<listener>
+		<listener-class>xdi2.server.spring.PluginsLoaderListener</listener-class>
+	</listener>
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+</web-app>

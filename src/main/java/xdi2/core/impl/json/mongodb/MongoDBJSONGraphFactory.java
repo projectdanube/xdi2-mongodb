@@ -3,6 +3,8 @@ package xdi2.core.impl.json.mongodb;
 
 import java.io.IOException;
 
+import org.apache.commons.codec.binary.Base64;
+
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.json.AbstractJSONGraphFactory;
 import xdi2.core.impl.json.JSONStore;
@@ -37,18 +39,21 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		// create mongo client
 
 		MongoClient mongoClient;
-		
+
 		if (this.getPort() != null) {
 
 			mongoClient = new MongoClient(this.getHost(), this.getPort());
 		} else {
-			
+
 			mongoClient = new MongoClient(this.getHost());
 		}
 
 		// open DB
 
-		DB db = mongoClient.getDB(identifier);
+		String dbName = identifier == null ? "" : new String(Base64.encodeBase64(identifier.getBytes("UTF-8")), "UTF-8") + ".";
+		dbName = "woot";
+
+		DB db = mongoClient.getDB(dbName);
 
 		// open store
 

@@ -1,14 +1,16 @@
 package xdi2.core.impl.json.mongodb;
 
-
 import java.io.IOException;
 import java.util.List;
+import java.util.Map.Entry;
 
 import xdi2.core.impl.json.AbstractJSONStore;
 import xdi2.core.impl.json.JSONStore;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -20,18 +22,16 @@ import com.mongodb.util.JSON;
 
 public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 
-	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
 
 	private MongoClient mongoClient;
 	private DB db;
-
 	private DBCollection dbCollection;
 
 	public MongoDBJSONStore(MongoClient mongoClient, DB db) {
 
 		this.mongoClient = mongoClient;
 		this.db = db;
-
 		this.dbCollection = null;
 	}
 
@@ -53,10 +53,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		DBObject object = this.dbCollection.findOne(new BasicDBObject("_id", id));
 		if (object == null) return new JsonObject();
 
-		StringBuilder builder = new StringBuilder();
-		JSON.serialize(object, builder);
-		System.err.println(builder.toString());
-		JsonObject jsonObject = gson.getAdapter(JsonObject.class).fromJson(builder.toString());
+		JsonObject jsonObject = fromMongoObject(object);
 
 		return jsonObject;
 	}
@@ -65,10 +62,9 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	@Override
 	protected void saveInternal(String id, JsonObject jsonObject) throws IOException {
 
-		DBObject object = (DBObject) JSON.parse(gson.toJson(jsonObject));
-		object.put("_id", id);
+		DBObject object = toMongoObject(jsonObject, id);
 
-		this.dbCollection.insert(object);
+		this.dbCollection.save(object);
 	}
 
 	@Override
@@ -86,6 +82,44 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	/*
 	 * Helper methods
 	 */
+
+	private static DBObject toMongoObject(JsonObject jsonObject, String id) {
+
+		DBObject object = new BasicDBObject();
+
+		for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+
+			String key = entry.getKey();
+			key = key.replace("$", "\\$");
+
+			object.put(key, JSON.parse(gson.toJson(entry.getValue())));
+		}
+
+		object.put("_id", id);
+
+		return object;
+	}
+
+	private static JsonObject fromMongoObject(DBObject object) throws IOException {
+
+		JsonObject jsonObject = new JsonObject();
+
+		for (String key : object.keySet()) {
+
+			if (key.equals("_id")) continue;
+			
+			StringBuilder builder = new StringBuilder();
+			JSON.serialize(object.get(key), builder);
+
+			key = key.replace("\\$", "$");
+
+			JsonArray jsonArray = gson.getAdapter(JsonArray.class).fromJson("[" + builder.toString() + "]");
+
+			jsonObject.add(key, jsonArray.get(0));
+		}
+
+		return jsonObject;
+	}
 
 	private static String escapeRegex(String string) {
 

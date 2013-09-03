@@ -2,8 +2,7 @@ package xdi2.core.impl.json.mongodb;
 
 
 import java.io.IOException;
-
-import org.apache.commons.codec.binary.Base64;
+import java.net.URLEncoder;
 
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.json.AbstractJSONGraphFactory;
@@ -50,8 +49,8 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 
 		// open DB
 
-		String dbName = identifier == null ? "" : new String(Base64.encodeBase64(identifier.getBytes("UTF-8")), "UTF-8") + ".";
-		dbName = "woot";
+		String dbName = identifier == null ? "" : new String(URLEncoder.encode(identifier, "UTF-8")).replace(".", "%2E").replace("-", "%2D").replace("%", "x");
+		System.out.println(dbName);
 
 		DB db = mongoClient.getDB(dbName);
 

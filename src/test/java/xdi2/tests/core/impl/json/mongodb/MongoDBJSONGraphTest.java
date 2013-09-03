@@ -1,11 +1,11 @@
-package xdi2.tests.core.impl;
+package xdi2.tests.core.impl.json.mongodb;
 
 import java.io.IOException;
 
 import xdi2.core.Graph;
 import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
 import xdi2.core.impl.json.mongodb.MongoDBJSONStore;
-import xdi2.tests.core.graph.AbstractGraphTest;
+import xdi2.tests.core.impl.AbstractGraphTest;
 
 public class MongoDBJSONGraphTest extends AbstractGraphTest {
 

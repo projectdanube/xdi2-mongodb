@@ -51,7 +51,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	protected JsonObject loadInternal(String id) throws IOException {
 
 		DBObject object = this.dbCollection.findOne(new BasicDBObject("_id", id));
-		if (object == null) return new JsonObject();
+		if (object == null) return null;
 
 		JsonObject jsonObject = fromMongoObject(object);
 
@@ -90,7 +90,8 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
 
 			String key = entry.getKey();
-			key = key.replace("$", "\\$");
+
+			if (key.startsWith("$")) key = "\\" + key;
 
 			object.put(key, JSON.parse(gson.toJson(entry.getValue())));
 		}
@@ -107,11 +108,11 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		for (String key : object.keySet()) {
 
 			if (key.equals("_id")) continue;
-			
+
 			StringBuilder builder = new StringBuilder();
 			JSON.serialize(object.get(key), builder);
 
-			key = key.replace("\\$", "$");
+			if (key.startsWith("\\$")) key = key.substring(1);
 
 			JsonArray jsonArray = gson.getAdapter(JsonArray.class).fromJson("[" + builder.toString() + "]");
 

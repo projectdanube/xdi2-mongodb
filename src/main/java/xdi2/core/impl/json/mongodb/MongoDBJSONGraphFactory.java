@@ -2,6 +2,7 @@ package xdi2.core.impl.json.mongodb;
 
 
 import java.io.IOException;
+import java.util.UUID;
 
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.json.AbstractJSONGraphFactory;
@@ -34,6 +35,8 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 	@Override
 	protected JSONStore openJSONStore(String identifier) throws IOException {
 
+		if (identifier == null) identifier = UUID.randomUUID().toString();
+
 		// create mongo client
 
 		MongoClient mongoClient;
@@ -48,7 +51,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 
 		// open DB
 
-		String dbName = identifier == null ? "" : MongoDBJSONStore.prepareDBName(identifier);
+		String dbName = MongoDBJSONStore.prepareDBName(identifier);
 
 		DB db = mongoClient.getDB(dbName);
 

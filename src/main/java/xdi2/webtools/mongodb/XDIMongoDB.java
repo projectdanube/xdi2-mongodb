@@ -107,7 +107,7 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 		request.setAttribute("input", sampleInputs.get(Integer.parseInt(sample) - 1));
 		request.setAttribute("endpoint", request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/")) + sampleEndpoint);
 
-		request.getRequestDispatcher("/XDIRedis.jsp").forward(request, response);
+		request.getRequestDispatcher("/XDIMongoDB.jsp").forward(request, response);
 	}
 
 	@Override

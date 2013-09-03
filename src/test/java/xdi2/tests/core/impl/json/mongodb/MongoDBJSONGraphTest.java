@@ -13,6 +13,11 @@ public class MongoDBJSONGraphTest extends AbstractGraphTest {
 
 	public static final String HOST = "localhost";
 
+	static {
+		
+		graphFactory.setHost(HOST);
+	}
+
 	@Override
 	protected void setUp() throws Exception {
 

@@ -1,9 +1,13 @@
 package xdi2.core.impl.json.mongodb;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.commons.codec.binary.Base64;
+
+import xdi2.core.exceptions.Xdi2RuntimeException;
 import xdi2.core.impl.json.AbstractJSONStore;
 import xdi2.core.impl.json.JSONStore;
 
@@ -32,6 +36,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 
 		this.mongoClient = mongoClient;
 		this.db = db;
+
 		this.dbCollection = null;
 	}
 
@@ -70,7 +75,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	@Override
 	protected void deleteInternal(final String id) throws IOException {
 
-		DBCursor cursor = this.dbCollection.find(new BasicDBObject("_id", "/" + escapeRegex(id) + ".*/"));
+		DBCursor cursor = this.dbCollection.find(new BasicDBObject("_id", "/" + prepareWildcardId(id) + ".*/"));
 
 		while (cursor.hasNext()) {
 
@@ -122,7 +127,20 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		return jsonObject;
 	}
 
-	private static String escapeRegex(String string) {
+	static String prepareDBName(String identifier) {
+
+		try {
+
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+			return new String(Base64.encodeBase64URLSafe(digest.digest(identifier.getBytes("UTF-8"))));
+		} catch (Exception ex) {
+
+			throw new Xdi2RuntimeException(ex);
+		}
+	}
+
+	static String prepareWildcardId(String string) {
 
 		return string
 				.replace("+", "\\+")

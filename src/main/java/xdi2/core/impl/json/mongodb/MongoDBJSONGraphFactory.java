@@ -2,7 +2,6 @@ package xdi2.core.impl.json.mongodb;
 
 
 import java.io.IOException;
-import java.net.URLEncoder;
 
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.json.AbstractJSONGraphFactory;
@@ -41,7 +40,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 
 		if (this.getPort() != null) {
 
-			mongoClient = new MongoClient(this.getHost(), this.getPort());
+			mongoClient = new MongoClient(this.getHost(), this.getPort().intValue());
 		} else {
 
 			mongoClient = new MongoClient(this.getHost());
@@ -49,8 +48,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 
 		// open DB
 
-		String dbName = identifier == null ? "" : new String(URLEncoder.encode(identifier, "UTF-8")).replace(".", "%2E").replace("-", "%2D").replace("%", "x");
-		System.out.println(dbName);
+		String dbName = identifier == null ? "" : MongoDBJSONStore.prepareDBName(identifier);
 
 		DB db = mongoClient.getDB(dbName);
 

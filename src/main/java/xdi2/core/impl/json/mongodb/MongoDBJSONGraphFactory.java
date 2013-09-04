@@ -37,6 +37,10 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 
 		if (identifier == null) identifier = UUID.randomUUID().toString();
 
+		// check identifier
+
+		String dbName = MongoDBJSONStore.prepareDBName(identifier);
+		
 		// create mongo client
 
 		MongoClient mongoClient;
@@ -50,8 +54,6 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		}
 
 		// open DB
-
-		String dbName = MongoDBJSONStore.prepareDBName(identifier);
 
 		DB db = mongoClient.getDB(dbName);
 

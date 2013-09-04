@@ -39,7 +39,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 
 		// check identifier
 
-		String dbName = MongoDBJSONStore.prepareDBName(identifier);
+		String dbName = MongoDBJSONStore.toMongoDBName(identifier);
 		
 		// create mongo client
 

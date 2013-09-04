@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -16,10 +17,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
@@ -63,7 +64,6 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		return jsonObject;
 	}
 
-
 	@Override
 	protected void saveInternal(String id, JsonObject jsonObject) throws IOException {
 
@@ -73,15 +73,33 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	}
 
 	@Override
+	protected void saveToArrayInternal(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
+
+		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$addToSet", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
+	}
+
+	@Override
+	protected void saveToObjectInternal(String id, String key, JsonElement jsonElement) throws IOException {
+
+		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$set", new BasicDBObject(toMongoKey(key), toMongoElement(jsonElement))), true, false);
+	}
+
+	@Override
 	protected void deleteInternal(final String id) throws IOException {
 
-		DBCursor cursor = this.dbCollection.find(new BasicDBObject("_id", "/" + prepareWildcardId(id) + ".*/"));
+		this.dbCollection.remove(new BasicDBObject("_id", toMongoStartsWithRegex(id)));
+	}
 
-		while (cursor.hasNext()) {
+	@Override
+	protected void deleteFromArrayInternal(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
 
-			cursor.remove();
-			cursor.next();
-		}
+		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$pull", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
+	}
+
+	@Override
+	protected void deleteFromObjectInternal(String id, String key) throws IOException {
+
+		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$unset", new BasicDBObject(toMongoKey(key), "")), false, false);
 	}
 
 	/*
@@ -95,10 +113,9 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
 
 			String key = entry.getKey();
+			JsonElement value = entry.getValue();
 
-			if (key.startsWith("$")) key = "\\" + key;
-
-			object.put(key, JSON.parse(gson.toJson(entry.getValue())));
+			object.put(toMongoKey(key), toMongoElement(value));
 		}
 
 		object.put("_id", id);
@@ -112,22 +129,44 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 
 		for (String key : object.keySet()) {
 
+			Object value = object.get(key);
+
 			if (key.equals("_id")) continue;
 
-			StringBuilder builder = new StringBuilder();
-			JSON.serialize(object.get(key), builder);
-
-			if (key.startsWith("\\$")) key = key.substring(1);
-
-			JsonArray jsonArray = gson.getAdapter(JsonArray.class).fromJson("[" + builder.toString() + "]");
-
-			jsonObject.add(key, jsonArray.get(0));
+			jsonObject.add(fromMongoKey(key), fromMongoElement(value));
 		}
 
 		return jsonObject;
 	}
 
-	static String prepareDBName(String identifier) {
+	private static Object toMongoElement(JsonElement jsonElement) {
+
+		return JSON.parse(gson.toJson(jsonElement));
+	}
+
+	private static JsonElement fromMongoElement(Object object) throws IOException {
+
+		StringBuilder builder = new StringBuilder();
+		JSON.serialize(object, builder);
+
+		return gson.getAdapter(JsonArray.class).fromJson("[" + builder.toString() + "]").get(0);
+	}
+
+	private static String toMongoKey(String key) {
+
+		if (key.startsWith("$")) key = "\\" + key;
+
+		return key;
+	}
+
+	private static String fromMongoKey(String key) {
+
+		if (key.startsWith("\\$")) key = key.substring(1);
+
+		return key;
+	}
+
+	static String toMongoDBName(String identifier) {
 
 		try {
 
@@ -140,9 +179,11 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		}
 	}
 
-	static String prepareWildcardId(String string) {
+	private static Pattern toMongoStartsWithRegex(String string) {
 
-		return string
+		StringBuilder buffer = new StringBuilder();
+
+		buffer.append(string
 				.replace("+", "\\+")
 				.replace("=", "\\=")
 				.replace("@", "\\@")
@@ -150,7 +191,21 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 				.replace("!", "\\!")
 				.replace("*", "\\*")
 				.replace("(", "\\(")
-				.replace(")", "\\)");
+				.replace(")", "\\)")
+				.replace("[", "\\[")
+				.replace("]", "\\]")
+				.replace("<", "\\<")
+				.replace(">", "\\>")
+				.replace("&", "\\&"));
+
+		buffer.append(".*");
+
+		return Pattern.compile(buffer.toString());
+	}
+
+	public static void cleanup() {
+
+		cleanup(null, null);
 	}
 
 	public static void cleanup(String host) {
@@ -162,7 +217,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 
 		try {
 
-			MongoClient mongoClient = port == null ? new MongoClient(host) : new MongoClient(host, port.intValue());
+			MongoClient mongoClient = port == null ? (host == null ? new MongoClient() : new MongoClient(host)) : new MongoClient(host, port.intValue());
 
 			List<String> databaseNames = mongoClient.getDatabaseNames();
 			for (String databaseName : databaseNames) mongoClient.dropDatabase(databaseName);

@@ -144,8 +144,8 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 
 			// reset MongoDB logs
 
-			((MongoDBJSONStore) ((JSONGraph) this.getGraph()).getJSONStore()).setLogEnabled(true);
-			((MongoDBJSONStore) ((JSONGraph) this.getGraph()).getJSONStore()).resetLogBuffer();
+			((MongoDBJSONStore) ((JSONGraph) this.getGraph()).getJsonStore()).setLogEnabled(true);
+			((MongoDBJSONStore) ((JSONGraph) this.getGraph()).getJsonStore()).resetLogBuffer();
 
 			// parse the message envelope
 
@@ -192,7 +192,7 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 		stats = "";
 		stats += Long.toString(stop - start) + " ms time. ";
 
-		mongoDBApiLog = "<pre>" + ((MongoDBJSONStore) ((JSONGraph) this.getGraph()).getJSONStore()).getLogBuffer().toString() + "</pre>";
+		mongoDBApiLog = "<pre>" + ((MongoDBJSONStore) ((JSONGraph) this.getGraph()).getJsonStore()).getLogBuffer().toString() + "</pre>";
 
 		// display results
 

@@ -194,6 +194,8 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 				.replace(")", "\\)")
 				.replace("[", "\\[")
 				.replace("]", "\\]")
+				.replace("{", "\\{")
+				.replace("}", "\\}")
 				.replace("<", "\\<")
 				.replace(">", "\\>")
 				.replace("&", "\\&"));

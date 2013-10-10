@@ -4,6 +4,9 @@ package xdi2.core.impl.json.mongodb;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.json.AbstractJSONGraphFactory;
 import xdi2.core.impl.json.JSONStore;
@@ -17,6 +20,8 @@ import com.mongodb.MongoClient;
  * @author markus
  */
 public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements GraphFactory {
+
+	private static final Logger log = LoggerFactory.getLogger(MongoDBJSONGraphFactory.class);
 
 	public static final String DEFAULT_HOST = "localhost";
 	public static final Integer DEFAULT_PORT = null;
@@ -40,7 +45,9 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		// check identifier
 
 		String dbName = MongoDBJSONStore.toMongoDBName(identifier);
-		
+
+		if (log.isDebugEnabled()) log.debug("DBName for identifier " + identifier + " is " + dbName);
+
 		// create mongo client
 
 		MongoClient mongoClient;

@@ -76,6 +76,10 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		return jsonStore;
 	}
 
+	/*
+	 * Getters and setters
+	 */
+	
 	public String getHost() {
 
 		return this.host;

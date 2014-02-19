@@ -37,7 +37,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		this.host = DEFAULT_HOST;
 		this.port = DEFAULT_PORT;
 		this.mockFlag = Boolean.FALSE;
-		this.hashIdentifierFlag = Boolean.FALSE;
+		this.hashIdentifierFlag = Boolean.TRUE;
 	}
 
 	@Override
@@ -47,8 +47,8 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 			identifier = UUID.randomUUID().toString();
 		}
 
-		if (log.isDebugEnabled()) {
-			log.debug("openJSONStore for identifier " + identifier);
+		if (log.isTraceEnabled()) {
+			log.trace("openJSONStore for identifier " + identifier);
 		}
 
 		if (Boolean.TRUE.equals(this.getHashIdentifierFlag())) {

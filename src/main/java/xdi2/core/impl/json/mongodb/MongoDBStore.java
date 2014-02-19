@@ -60,8 +60,8 @@ public class MongoDBStore {
 	}
 
 	public static synchronized MongoDBStore getMongoDBStore(String host, Integer port, Boolean mockFlag) {
-		if (log.isDebugEnabled()) {
-			log.debug("MongoDBStore.getMongoDBStore() " + host + " " + port + " " + mockFlag);
+		if (log.isTraceEnabled()) {
+			log.trace("getMongoDBStore() " + host + " " + port + " " + mockFlag);
 		}
 		String key = getKey(host, port);
 		MongoDBStore rtn = mongoDBStores.get(key);
@@ -90,7 +90,7 @@ public class MongoDBStore {
 			rtn = new MongoDBStore(client, db, dbCollection);
 			mongoDBStores.put(key, rtn);
 		} catch (java.net.UnknownHostException e) {
-			log.error("Cannot create MongoDBStore - " + e, e);
+			log.error("getMongoDBStore() " + host + " " + port + " " + mockFlag + " failed - " + e, e);
 			rtn = null;
 		}
 		return rtn;
@@ -117,16 +117,20 @@ public class MongoDBStore {
 				dbName = databaseName;
 				if (Boolean.TRUE.equals(mockFlag)) {
 					if (XDI2_DBNAME_MOCK.equals(databaseName)) {
-						log.debug("cleanup " + host + " " + port + " " + mockFlag + " db=" + databaseName);
+						if (log.isTraceEnabled()) {
+							log.trace("cleanup() " + host + " " + port + " " + mockFlag + " db=" + databaseName);
+						}
 						mongoClient.dropDatabase(databaseName);
 					}
 				} else if(XDI2_DBNAME.equals(databaseName)) {
-					log.debug("cleanup " + host + " " + port + " " + mockFlag + " db=" + databaseName);
+					if (log.isTraceEnabled()) {
+						log.trace("cleanup ()" + host + " " + port + " " + mockFlag + " db=" + databaseName);
+					}
 					mongoClient.dropDatabase(databaseName);
 				}
 			}
 		} catch (Exception ex) {
-			log.error("cleanup " + host + " " + port + " " + mockFlag + " db=" + dbName + " failed", ex);
+			log.error("cleanup() " + host + " " + port + " " + mockFlag + " db=" + dbName + " failed - " + ex, ex);
 			throw new RuntimeException(ex.getMessage(), ex);
 		}
 	}

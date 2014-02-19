@@ -55,72 +55,95 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	 * @return a <code>BasicDBObject</code> combiniing graph identifier and the secondary key.
 	 */
 	private BasicDBObject getKey(Object key) {
+
 		return new BasicDBObject(MongoDBStore.XDI2_OBJ_ID, this.identifier).append(MongoDBStore.XDI2_OBJ_KEY, key);
 	}
 
 	@Override
 	protected JsonObject loadInternal(String id) throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("MongoDBJSONStore.loadInternal() - " + this.identifier + " " + id);
+
+		if (log.isTraceEnabled()) {
+			log.trace("loadInternal() - " + this.identifier + " " + id);
 		}
+
 		DBObject object = this.dbStore.getCollection().findOne(this.getKey(id));
-		if (log.isDebugEnabled()) {
-			log.debug("MongoDBJSONStore.loadInternal() - " + this.identifier + " " + id + " = " + object);
+
+		if (log.isTraceEnabled()) {
+			log.trace("loadInternal() - " + this.identifier + " " + id + " = " + object);
 		}
+
 		JsonObject jsonObject = fromMongoObject(object);
-		if (log.isDebugEnabled()) {
-			log.debug("MongoDBJSONStore.loadInternal() - " + this.identifier + " " + id + " = " + jsonObject);
+
+		if (log.isTraceEnabled()) {
+			log.trace("loadInternal() - " + this.identifier + " " + id + " = " + jsonObject);
 		}
+
 		return jsonObject;
 	}
 
 	@Override
 	protected void saveInternal(String id, JsonObject jsonObject) throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("MongoDBJSONStore.saveInternal() - " + this.identifier + " " + id + " " + jsonObject);
+
+		if (log.isTraceEnabled()) {
+			log.trace("saveInternal() - " + this.identifier + " " + id + " " + jsonObject);
 		}
+
 		DBObject object = toMongoObject(jsonObject, id);
+
+		if (log.isTraceEnabled()) {
+			log.trace("saveInternal() - " + this.identifier + " " + id + " " + object);
+		}
+
 		this.dbStore.getCollection().save(object);
 	}
 
 	@Override
 	protected void saveToArrayInternal(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("MongoDBJSONStore.saveToArrayInternal() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
+
+		if (log.isTraceEnabled()) {
+			log.trace("saveToArrayInternal() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
 		}
+
 		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$addToSet", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
 	}
 
 	@Override
 	protected void saveToObjectInternal(String id, String key, JsonElement jsonElement) throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("MongoDBJSONStore.saveToObjectInternal() - " + this.identifier + " " + id + " " + key + " " + jsonElement);
+
+		if (log.isTraceEnabled()) {
+			log.trace("saveToObjectInternal() - " + this.identifier + " " + id + " " + key + " " + jsonElement);
 		}
+
 		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$set", new BasicDBObject(toMongoKey(key), toMongoElement(jsonElement))), true, false);
 	}
 
 	@Override
 	protected void deleteInternal(final String id) throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("MongoDBJSONStore.deleteInternal() - " + this.identifier + " " + id);
+
+		if (log.isTraceEnabled()) {
+			log.trace("deleteInternal() - " + this.identifier + " " + id);
 		}
+
 		this.dbStore.getCollection().remove(this.getKey(toMongoStartsWithRegex(id)));
 	}
 
 	@Override
 	protected void deleteFromArrayInternal(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("MongoDBJSONStore.deleteFromArrayInternal() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
+
+		if (log.isTraceEnabled()) {
+			log.trace("deleteFromArrayInternal() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
 		}
+
 		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$pull", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
 	}
 
 	@Override
 	protected void deleteFromObjectInternal(String id, String key) throws IOException {
 
-		if (log.isDebugEnabled()) {
-			log.debug("MongoDBJSONStore.deleteFromObjectInternal() - " + this.identifier + " " + id + " " + key);
+		if (log.isTraceEnabled()) {
+			log.trace("deleteFromObjectInternal() - " + this.identifier + " " + id + " " + key);
 		}
+
 		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$unset", new BasicDBObject(toMongoKey(key), "")), false, false);
 	}
 
@@ -147,6 +170,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		if (object == null) {
 			return null;
 		}
+
 		JsonObject jsonObject = new JsonObject();
 
 		for (String key : object.keySet()) {

@@ -67,7 +67,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		return jsonStore;
 	}
 
-	private String hashIdentifier(String identifier) {
+	public static String hashIdentifier(String identifier) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
 			return new String(Base64.encodeBase64URLSafe(digest.digest(identifier.getBytes("UTF-8"))));

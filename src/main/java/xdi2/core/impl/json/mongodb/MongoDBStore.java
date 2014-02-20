@@ -21,11 +21,11 @@ public class MongoDBStore {
 
 	public  static final String XDI2_OBJ_ID       = "id";
 	public  static final String XDI2_OBJ_KEY      = "key";
-	private static final String XDI2_OBJ_INDEX    = "idx";
+	public  static final String XDI2_OBJ_INDEX    = "idx";
 
-	private static final String XDI2_DBNAME       = "xdi2graph";
-	private static final String XDI2_DBNAME_MOCK  = "xdi2graph_mock";
-	private static final String XDI2_DBCOLLECTION = "contexts";
+	public  static final String XDI2_DBNAME       = "xdi2graph";
+	public  static final String XDI2_DBNAME_MOCK  = "xdi2graph_mock";
+	public  static final String XDI2_DBCOLLECTION = "contexts";
 
 	private MongoClient		client;
 	private DB			db;
@@ -84,8 +84,8 @@ public class MongoDBStore {
 			}
 			DBCollection dbCollection = db.getCollection(XDI2_DBCOLLECTION);
 			BasicDBObject idx = new BasicDBObject();
-			idx.put(XDI2_OBJ_ID , 1);
 			idx.put(XDI2_OBJ_KEY, 1);
+			idx.put(XDI2_OBJ_ID , 1);
 			dbCollection.ensureIndex(idx, XDI2_OBJ_INDEX, true);
 			rtn = new MongoDBStore(client, db, dbCollection);
 			mongoDBStores.put(key, rtn);

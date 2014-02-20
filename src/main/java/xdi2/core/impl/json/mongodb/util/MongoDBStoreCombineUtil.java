@@ -277,11 +277,14 @@ public class MongoDBStoreCombineUtil
 	private static void usage() {
 		String name = MongoDBStoreCombineUtil.class.getName();
 		System.out.println("Usage: java " + name + " [-hash|-nohash] [-test|-copy] -src sourcedb[:port] -dst targetdb[:port]");
+		System.out.println("");
+		System.out.println("Default: -nohash  does not use hashed values of graph identifiers in the target database"); 
+		System.out.println("         -test    does not perform actual insert operations in the target database");
 		System.exit(1);
 	}
 
 	public static void main(String args[]) {
-		Boolean useHash = Boolean.TRUE;
+		Boolean useHash = Boolean.FALSE;
 		Boolean dryRun  = Boolean.TRUE;
 		String  srcHost = null;
 		Integer srcPort = null;

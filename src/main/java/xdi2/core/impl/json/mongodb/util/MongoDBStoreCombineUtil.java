@@ -25,7 +25,7 @@ import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
 public class MongoDBStoreCombineUtil
 {
 	/**
- 	 * The following are special XDI2 graph identifiers
+	 * The following are special XDI2 graph identifiers
 	 */ 	 
 	private static String XDI2_SPECIAL_IDS[] = {
 		"REGISTRY" ,
@@ -38,25 +38,25 @@ public class MongoDBStoreCombineUtil
 	private Integer     srcPort;
 	private String      dstHost;
 	private Integer     dstPort;
-        private Boolean     useHash;
+	private Boolean     useHash;
 	private Boolean     dryRun;
 	private MongoClient srcClient;
 	private MongoClient dstClient;
 	private int         cntUnknownIds;
 
 	/**
- 	 * Constractor for instantiating a <code>MongoDBStoreCombineUtil</code> for
- 	 * copying XDI2 graphs stored in its own MongoDB database into a single
- 	 * MongoDB databases holding all XDI2 graphs.
- 	 *
- 	 * @param srcHost the host name of the source MongoDB instance.
- 	 * @param srcPort the port number of the source MongoDB instance.
- 	 * @param dstHost the host name of the target MongoDB instance.
- 	 * @param dstPort the port number of the target MongoDB instance.
- 	 * @param useHash the boolean flag indicating if hashed graph identifier.
- 	 *                should used in the target MongoDB instance.
- 	 * @param dryRun  the boolean flag for dry test run only.
- 	 */
+	 * Constractor for instantiating a <code>MongoDBStoreCombineUtil</code> for
+	 * copying XDI2 graphs stored in its own MongoDB database into a single
+	 * MongoDB databases holding all XDI2 graphs.
+	 *
+	 * @param srcHost the host name of the source MongoDB instance.
+	 * @param srcPort the port number of the source MongoDB instance.
+	 * @param dstHost the host name of the target MongoDB instance.
+	 * @param dstPort the port number of the target MongoDB instance.
+	 * @param useHash the boolean flag indicating if hashed graph identifier.
+	 *                should used in the target MongoDB instance.
+	 * @param dryRun  the boolean flag for dry test run only.
+	 */
 	public MongoDBStoreCombineUtil(String srcHost, Integer srcPort, String dstHost, Integer dstPort, Boolean useHash, Boolean dryRun) {
 		this.srcHost = srcHost;
 		this.srcPort = srcPort;
@@ -92,10 +92,10 @@ public class MongoDBStoreCombineUtil
 	}
 
 	/**
- 	 * Initializes MongoDB connections.
- 	 *
- 	 * @return a boolean flag indicating if the operation is successful
- 	 */
+	 * Initializes MongoDB connections.
+	 *
+	 * @return a boolean flag indicating if the operation is successful
+	 */
 	public boolean init() {
 		this.srcClient = this.getClient(this.srcHost, this.srcPort);
 		this.dstClient = this.getClient(this.dstHost, this.dstPort);
@@ -120,11 +120,11 @@ public class MongoDBStoreCombineUtil
 	}
 
 	/**
- 	 * Gets the hashed value of a XDI2 graph identifier
- 	 *
- 	 * @param identifier the XDI2 graph identifier in plaintext, usually a cloud number.
- 	 * @return the hash value of the identifier, or null if failure.
- 	 */
+	 * Gets the hashed value of a XDI2 graph identifier
+	 *
+	 * @param identifier the XDI2 graph identifier in plaintext, usually a cloud number.
+	 * @return the hash value of the identifier, or null if failure.
+	 */
 	private String hashIdentifier(String identifier) {
 		String rtn = null;
 		rtn = MongoDBJSONGraphFactory.hashIdentifier(identifier);
@@ -135,13 +135,13 @@ public class MongoDBStoreCombineUtil
 	}
 
 	/**
- 	 * Extracts XDI2 graph identifier from existing XDI2 graph object.
- 	 *
- 	 * @param db the database name of an existing XDI2 graph, which is the
- 	 *           hashed version of the XDI2 graph identifier.
- 	 *        obj the <code>DBObject</code> to be checked for XDI2 graph identifier value
- 	 * @return the XDI2 graph identifier in plaintext, or null if not found.
- 	 */
+	 * Extracts XDI2 graph identifier from existing XDI2 graph object.
+	 *
+	 * @param db the database name of an existing XDI2 graph, which is the
+	 *           hashed version of the XDI2 graph identifier.
+	 *        obj the <code>DBObject</code> to be checked for XDI2 graph identifier value
+	 * @return the XDI2 graph identifier in plaintext, or null if not found.
+	 */
 	private String getIdentifier(String db, DBObject obj) {
 		String rtn = null;
 		Object key = obj.get("_id");
@@ -180,11 +180,11 @@ public class MongoDBStoreCombineUtil
 	}
 
 	/**
- 	 * Copies an XDI2 graph from the existing MongoDB into the new one.
- 	 *
- 	 * @param db the MongoDB database name of the existing XDI2 graph.
- 	 * @param src the <code>DBCollection</code> object for the existing MongoDB database for the XDI2 graph.
- 	 * @param dst the <code>DBCollection</code> object for new MongoDB database.
+	 * Copies an XDI2 graph from the existing MongoDB into the new one.
+	 *
+	 * @param db the MongoDB database name of the existing XDI2 graph.
+	 * @param src the <code>DBCollection</code> object for the existing MongoDB database for the XDI2 graph.
+	 * @param dst the <code>DBCollection</code> object for new MongoDB database.
 	 * @return number of records copied.
 	 */
 	private int copy(String db, DBCollection src, DBCollection dst) {
@@ -236,10 +236,10 @@ public class MongoDBStoreCombineUtil
 	}
 
 	/**
- 	 * Copies all XDI2 graphs from the existing MongoDB databases into the new one.
- 	 *
- 	 * @return number of XDI2 graph copied.
- 	 */
+	 * Copies all XDI2 graphs from the existing MongoDB databases into the new one.
+	 *
+	 * @return number of XDI2 graph copied.
+	 */
 	public void copy() {
 		int totalGraphs  = 0;
 		int totalRecords = 0;
@@ -272,8 +272,8 @@ public class MongoDBStoreCombineUtil
 	}
 
 	/**
- 	 * Prints out the usage of this utility.
- 	 */
+	 * Prints out the usage of this utility.
+	 */
 	private static void usage() {
 		String name = MongoDBStoreCombineUtil.class.getName();
 		System.out.println("Usage: java " + name + " [-hash|-nohash] [-test|-copy] -src sourcedb[:port] -dst targetdb[:port]");
@@ -326,7 +326,7 @@ public class MongoDBStoreCombineUtil
 		}
 		MongoDBStoreCombineUtil util = new MongoDBStoreCombineUtil(srcHost, srcPort, dstHost, dstPort, useHash, dryRun);
 		try {
-			if( util.init() ) {
+			if (util.init()) {
 				util.copy();
 			}
 			util.finish();

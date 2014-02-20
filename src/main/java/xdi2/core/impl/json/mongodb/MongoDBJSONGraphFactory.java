@@ -37,7 +37,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		this.host = DEFAULT_HOST;
 		this.port = DEFAULT_PORT;
 		this.mockFlag = Boolean.FALSE;
-		this.hashIdentifierFlag = Boolean.TRUE;
+		this.hashIdentifierFlag = Boolean.FALSE;
 	}
 
 	@Override

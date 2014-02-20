@@ -251,10 +251,12 @@ public class MongoDBStoreCombineUtil
 		long dstCount = dst.getCount();
 		System.out.println("Old Records in Target: " + dstCount);
 
+		int dbNameLength = this.hashIdentifier("([=]!:uuid:97ec0032-350f-4ccc-ab99-9ed09c1f994c)]").length();
+
 		List<String> list = this.srcClient.getDatabaseNames();
 		if (list != null) {
 			for (String db : list) {
-				if (db.length() != 43) {
+				if (db.length() != dbNameLength) {
 					continue;
 				}
 				DBCollection src = this.srcClient.getDB(db).getCollection(MongoDBStore.XDI2_DBCOLLECTION);

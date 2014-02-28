@@ -54,7 +54,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	}
 
 	@Override
-	protected JsonObject loadInternal(String id) throws IOException {
+	public JsonObject load(String id) throws IOException {
 
 		DBObject object = this.dbCollection.findOne(new BasicDBObject("_id", id));
 		if (object == null) return null;
@@ -65,7 +65,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	}
 
 	@Override
-	protected void saveInternal(String id, JsonObject jsonObject) throws IOException {
+	public void save(String id, JsonObject jsonObject) throws IOException {
 
 		DBObject object = toMongoObject(jsonObject, id);
 
@@ -73,31 +73,31 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	}
 
 	@Override
-	protected void saveToArrayInternal(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
+	public void saveToArray(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
 
 		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$addToSet", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
 	}
 
 	@Override
-	protected void saveToObjectInternal(String id, String key, JsonElement jsonElement) throws IOException {
+	public void saveToObject(String id, String key, JsonElement jsonElement) throws IOException {
 
 		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$set", new BasicDBObject(toMongoKey(key), toMongoElement(jsonElement))), true, false);
 	}
 
 	@Override
-	protected void deleteInternal(final String id) throws IOException {
+	public void delete(final String id) throws IOException {
 
 		this.dbCollection.remove(new BasicDBObject("_id", toMongoStartsWithRegex(id)));
 	}
 
 	@Override
-	protected void deleteFromArrayInternal(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
+	public void deleteFromArray(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
 
 		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$pull", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
 	}
 
 	@Override
-	protected void deleteFromObjectInternal(String id, String key) throws IOException {
+	public void deleteFromObject(String id, String key) throws IOException {
 
 		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$unset", new BasicDBObject(toMongoKey(key), "")), false, false);
 	}

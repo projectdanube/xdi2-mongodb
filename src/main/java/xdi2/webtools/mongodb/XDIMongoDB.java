@@ -190,6 +190,9 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 
 		stats = "";
 		stats += Long.toString(stop - start) + " ms time. ";
+		stats += Integer.toString(count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "cache HIT")) + " load operations from cache. ";
+		stats += Integer.toString(count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "cache MISS")) + " load operations from store. ";
+		stats += Integer.toString(count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "\n") - count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "cache")) + " write operations. ";
 
 		mongoDBApiLog = "<pre>" + ((JSONGraph) this.getGraph()).getLogBuffer().toString() + "</pre>";
 
@@ -219,5 +222,20 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 	public void setGraph(Graph graph) {
 
 		this.graph = graph;
+	}
+
+	private static int count(String string, String subString) {
+
+		int count = 0, pos = 0;
+
+		while (true) {
+
+			pos = string.indexOf(subString, pos + 1);
+			if (pos == -1) break;
+
+			count++;
+		}
+
+		return count;
 	}
 }

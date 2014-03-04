@@ -24,7 +24,6 @@ import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.client.http.XDIHttpClient;
 import xdi2.core.Graph;
 import xdi2.core.impl.json.JSONGraph;
-import xdi2.core.impl.json.mongodb.MongoDBJSONStore;
 import xdi2.core.impl.memory.MemoryGraphFactory;
 import xdi2.core.io.XDIReader;
 import xdi2.core.io.XDIReaderRegistry;
@@ -144,8 +143,8 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 
 			// reset MongoDB logs
 
-			((MongoDBJSONStore) ((JSONGraph) this.getGraph()).getJsonStore()).setLogEnabled(true);
-			((MongoDBJSONStore) ((JSONGraph) this.getGraph()).getJsonStore()).resetLogBuffer();
+			((JSONGraph) this.getGraph()).setLogEnabled(true);
+			((JSONGraph) this.getGraph()).resetLogBuffer();
 
 			// parse the message envelope
 
@@ -191,8 +190,11 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 
 		stats = "";
 		stats += Long.toString(stop - start) + " ms time. ";
+		stats += Integer.toString(count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "cache HIT")) + " load operations from cache. ";
+		stats += Integer.toString(count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "cache MISS")) + " load operations from store. ";
+		stats += Integer.toString(count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "\n") - count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "cache")) + " write operations. ";
 
-		mongoDBApiLog = "<pre>" + ((MongoDBJSONStore) ((JSONGraph) this.getGraph()).getJsonStore()).getLogBuffer().toString() + "</pre>";
+		mongoDBApiLog = "<pre>" + ((JSONGraph) this.getGraph()).getLogBuffer().toString() + "</pre>";
 
 		// display results
 
@@ -220,5 +222,20 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 	public void setGraph(Graph graph) {
 
 		this.graph = graph;
+	}
+
+	private static int count(String string, String subString) {
+
+		int count = 0, pos = 0;
+
+		while (true) {
+
+			pos = string.indexOf(subString, pos + 1);
+			if (pos == -1) break;
+
+			count++;
+		}
+
+		return count;
 	}
 }

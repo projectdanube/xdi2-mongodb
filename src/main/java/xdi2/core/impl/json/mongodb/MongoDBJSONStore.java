@@ -60,88 +60,88 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	}
 
 	@Override
-	protected JsonObject loadInternal(String id) throws IOException {
+	public JsonObject load(String id) throws IOException {
 
 		if (log.isTraceEnabled()) {
-			log.trace("loadInternal() - " + this.identifier + " " + id);
+			log.trace("load() - " + this.identifier + " " + id);
 		}
 
 		DBObject object = this.dbStore.getCollection().findOne(this.getKey(id));
 
 		if (log.isTraceEnabled()) {
-			log.trace("loadInternal() - " + this.identifier + " " + id + " = " + object);
+			log.trace("load() - " + this.identifier + " " + id + " = " + object);
 		}
 
 		JsonObject jsonObject = fromMongoObject(object);
 
 		if (log.isTraceEnabled()) {
-			log.trace("loadInternal() - " + this.identifier + " " + id + " = " + jsonObject);
+			log.trace("load() - " + this.identifier + " " + id + " = " + jsonObject);
 		}
 
 		return jsonObject;
 	}
 
 	@Override
-	protected void saveInternal(String id, JsonObject jsonObject) throws IOException {
+	public void save(String id, JsonObject jsonObject) throws IOException {
 
 		if (log.isTraceEnabled()) {
-			log.trace("saveInternal() - " + this.identifier + " " + id + " " + jsonObject);
+			log.trace("save() - " + this.identifier + " " + id + " " + jsonObject);
 		}
 
 		DBObject object = toMongoObject(jsonObject, id);
 
 		if (log.isTraceEnabled()) {
-			log.trace("saveInternal() - " + this.identifier + " " + id + " " + object);
+			log.trace("save() - " + this.identifier + " " + id + " " + object);
 		}
 
 		this.dbStore.getCollection().save(object);
 	}
 
 	@Override
-	protected void saveToArrayInternal(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
+	public void saveToArray(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
 
 		if (log.isTraceEnabled()) {
-			log.trace("saveToArrayInternal() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
+			log.trace("saveToArray() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
 		}
 
 		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$addToSet", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
 	}
 
 	@Override
-	protected void saveToObjectInternal(String id, String key, JsonElement jsonElement) throws IOException {
+	public void saveToObject(String id, String key, JsonElement jsonElement) throws IOException {
 
 		if (log.isTraceEnabled()) {
-			log.trace("saveToObjectInternal() - " + this.identifier + " " + id + " " + key + " " + jsonElement);
+			log.trace("saveToObject() - " + this.identifier + " " + id + " " + key + " " + jsonElement);
 		}
 
 		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$set", new BasicDBObject(toMongoKey(key), toMongoElement(jsonElement))), true, false);
 	}
 
 	@Override
-	protected void deleteInternal(final String id) throws IOException {
+	public void delete(final String id) throws IOException {
 
 		if (log.isTraceEnabled()) {
-			log.trace("deleteInternal() - " + this.identifier + " " + id);
+			log.trace("delete() - " + this.identifier + " " + id);
 		}
 
 		this.dbStore.getCollection().remove(this.getKey(toMongoStartsWithRegex(id)));
 	}
 
 	@Override
-	protected void deleteFromArrayInternal(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
+	public void deleteFromArray(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
 
 		if (log.isTraceEnabled()) {
-			log.trace("deleteFromArrayInternal() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
+			log.trace("deleteFromArray() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
 		}
 
 		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$pull", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
 	}
 
 	@Override
-	protected void deleteFromObjectInternal(String id, String key) throws IOException {
+	public void deleteFromObject(String id, String key) throws IOException {
 
 		if (log.isTraceEnabled()) {
-			log.trace("deleteFromObjectInternal() - " + this.identifier + " " + id + " " + key);
+			log.trace("deleteFromObject() - " + this.identifier + " " + id + " " + key);
 		}
 
 		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$unset", new BasicDBObject(toMongoKey(key), "")), false, false);

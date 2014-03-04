@@ -27,13 +27,22 @@ public class MongoDBStoreCombineUtil
 	/**
 	 * The following are special XDI2 graph identifiers
 	 */ 	 
-	private static String XDI2_SPECIAL_IDS[] = {
-		"REGISTRY" ,
-		"OWNYOURINFO-REGISTRY" ,
-		"EMMETTGLOBAL-REGISTRY",
-		"FULLXRI-REGISTRY",
-		"TESTCSP-REGISTRY"
-	};
+	private static List<String> xdi2_special_ids;
+	static
+	{
+		xdi2_special_ids = new ArrayList<String>();
+		xdi2_special_ids.add("REGISTRY");
+		xdi2_special_ids.add("OWNYOURINFO-REGISTRY");
+		xdi2_special_ids.add("EMMETTGLOBAL-REGISTRY");
+		xdi2_special_ids.add("FULLXRI-REGISTRY");
+		xdi2_special_ids.add("TESTCSP-REGISTRY");
+	}
+
+	public static void addSpecialId(String id) {
+		if (id != null) {
+			xdi2_special_ids.add(id);
+		}
+	}
 
 	private String      srcHost;
 	private Integer     srcPort;
@@ -170,7 +179,7 @@ public class MongoDBStoreCombineUtil
 			}
 		}
 		if (rtn == null) {
-			for (String id : XDI2_SPECIAL_IDS) {
+			for (String id : xdi2_special_ids) {
 				if (db.equals(this.hashIdentifier(id))) {
 					rtn = id;
 					break;
@@ -277,7 +286,7 @@ public class MongoDBStoreCombineUtil
 	 */
 	private static void usage() {
 		String name = MongoDBStoreCombineUtil.class.getName();
-		System.out.println("Usage: java " + name + " [-hash|-nohash] [-test|-copy] -src sourcedb[:port] -dst targetdb[:port]");
+		System.out.println("Usage: java " + name + " [-sid specialid]* [-hash|-nohash] [-test|-copy] -src sourcedb[:port] -dst targetdb[:port]");
 		System.out.println("");
 		System.out.println("Default: -nohash  does not use hashed values of graph identifiers in the target database"); 
 		System.out.println("         -test    does not perform actual insert operations in the target database");
@@ -301,6 +310,8 @@ public class MongoDBStoreCombineUtil
 				dryRun = Boolean.FALSE;
 			} else if ("-test".equals(args[i])) {
 				dryRun = Boolean.TRUE;
+			} else if ("-sid".equals(args[i]) && ((i + 1) < args.length)) {
+				MongoDBStoreCombineUtil.addSpecialId(args[++i]);
 			} else if ("-src".equals(args[i]) && ((i + 1) < args.length)) {
 				srcHost = args[++i];
 			} else if ("-dst".equals(args[i]) && ((i + 1) < args.length)) {

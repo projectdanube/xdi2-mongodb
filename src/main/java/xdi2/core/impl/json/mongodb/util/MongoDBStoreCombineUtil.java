@@ -31,7 +31,8 @@ public class MongoDBStoreCombineUtil
 		"REGISTRY" ,
 		"OWNYOURINFO-REGISTRY" ,
 		"EMMETTGLOBAL-REGISTRY",
-		"FULLXRI-REGISTRY"
+		"FULLXRI-REGISTRY",
+		"TESTCSP-REGISTRY"
 	};
 
 	private String      srcHost;

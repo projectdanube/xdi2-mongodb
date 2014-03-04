@@ -56,7 +56,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	 */
 	private BasicDBObject getKey(Object key) {
 
-		return new BasicDBObject(MongoDBStore.XDI2_OBJ_KEY, this.identifier).append(MongoDBStore.XDI2_OBJ_ID, key);
+		return new BasicDBObject(MongoDBStore.XDI2_OBJ_KEY, key).append(MongoDBStore.XDI2_OBJ_ID, this.identifier);
 	}
 
 	@Override

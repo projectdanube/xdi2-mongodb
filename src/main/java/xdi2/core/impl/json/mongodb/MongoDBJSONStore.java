@@ -223,6 +223,8 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 
 			List<String> databaseNames = mongoClient.getDatabaseNames();
 			for (String databaseName : databaseNames) mongoClient.dropDatabase(databaseName);
+
+			mongoClient.close();
 		} catch (Exception ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);

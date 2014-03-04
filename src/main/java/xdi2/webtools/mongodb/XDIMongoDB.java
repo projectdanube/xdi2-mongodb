@@ -192,7 +192,7 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 		stats += Long.toString(stop - start) + " ms time. ";
 		stats += Integer.toString(count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "cache HIT")) + " load operations from cache. ";
 		stats += Integer.toString(count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "cache MISS")) + " load operations from store. ";
-		stats += Integer.toString(count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "\n") - count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "cache")) + " write operations. ";
+		stats += Integer.toString(count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "\n") - count(((JSONGraph) this.getGraph()).getLogBuffer().toString(), "cache")) + " write operations to store. ";
 
 		mongoDBApiLog = "<pre>" + ((JSONGraph) this.getGraph()).getLogBuffer().toString() + "</pre>";
 

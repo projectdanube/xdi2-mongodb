@@ -2,7 +2,10 @@ package xdi2.core.impl.json.mongodb;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
@@ -21,6 +24,7 @@ import com.google.gson.JsonPrimitive;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
@@ -62,6 +66,24 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		JsonObject jsonObject = fromMongoObject(object);
 
 		return jsonObject;
+	}
+
+	@Override
+	public Map<String, JsonObject> loadWithPrefix(String id) throws IOException {
+
+		DBCursor cursor = this.dbCollection.find(new BasicDBObject("_id", toMongoStartsWithRegex(id)));
+		if (cursor == null) return Collections.emptyMap();
+
+		Map<String, JsonObject> jsonObjects = new HashMap<String, JsonObject> ();
+
+		while (cursor.hasNext()) {
+
+			DBObject object = cursor.next();
+
+			jsonObjects.put((String) object.get("_id"), fromMongoObject(object));
+		}
+
+		return jsonObjects;
 	}
 
 	@Override

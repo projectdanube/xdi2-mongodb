@@ -38,6 +38,12 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 	}
 
 	@Override
+	public boolean supportsPersistence() {
+
+		return true;
+	}
+
+	@Override
 	protected JSONStore openJSONStore(String identifier) throws IOException {
 
 		if (identifier == null) identifier = UUID.randomUUID().toString();
@@ -79,7 +85,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 	/*
 	 * Getters and setters
 	 */
-	
+
 	public String getHost() {
 
 		return this.host;

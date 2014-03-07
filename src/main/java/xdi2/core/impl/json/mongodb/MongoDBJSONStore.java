@@ -83,6 +83,8 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 			jsonObjects.put((String) object.get("_id"), fromMongoObject(object));
 		}
 
+		cursor.close();
+
 		return jsonObjects;
 	}
 

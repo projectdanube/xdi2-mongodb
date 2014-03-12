@@ -53,6 +53,7 @@ public class MongoDBStoreCombineUtil
 	private MongoClient srcClient;
 	private MongoClient dstClient;
 	private int         cntUnknownIds;
+	private Boolean     switchFlag;
 
 	/**
 	 * Constractor for instantiating a <code>MongoDBStoreCombineUtil</code> for
@@ -77,6 +78,31 @@ public class MongoDBStoreCombineUtil
 		this.srcClient = null;
 		this.dstClient = null;
 		this.cntUnknownIds = 0;
+		this.switchFlag = Boolean.FALSE;
+	}
+
+	/**
+	 * Sets the boolean flag indicating if [+] should be used instead of [@]
+	 * for finding graph identifiers, with the default as FALSE, if not set
+	 *
+	 * @param switchFlag the boolean flag indicating if [+] should be used instead of [@]
+	 */
+	public void setSwitchFlag( Boolean switchFlag ) {
+		this.switchFlag = switchFlag;
+		if (this.switchFlag == null) {
+			this.switchFlag = Boolean.FALSE;
+		}
+	}
+
+	/**
+	 * Gets the the boolean flag indicating if [+] should be used instead of [@]
+	 * for finding graph identifiers, with the default as FALSE, if not set
+	 *
+	 * @return the boolean flag indicating if [+] should be used instead of [@], with
+	 *         the default as FALSE
+	 */
+	public Boolean getSwitchFlag() {
+		return this.switchFlag;
 	}
 
 	/**
@@ -161,7 +187,9 @@ public class MongoDBStoreCombineUtil
 		if (! (key instanceof String)) {
 			return rtn;
 		}
-		if (! "[=]".equals(key) && ! "[@]".equals(key)) {
+		if (    ! "[=]".equals(key)
+		     && (    (this.getSwitchFlag().equals(Boolean.FALSE) && ! "[@]".equals(key))
+			  || (this.getSwitchFlag().equals(Boolean.TRUE ) && ! "[+]".equals(key)) ) ) {
 			return rtn;
 		}
 		Object val = obj.get("");
@@ -286,9 +314,10 @@ public class MongoDBStoreCombineUtil
 	 */
 	private static void usage() {
 		String name = MongoDBStoreCombineUtil.class.getName();
-		System.out.println("Usage: java " + name + " [-sid specialid]* [-hash|-nohash] [-test|-copy] -src sourcedb[:port] -dst targetdb[:port]");
+		System.out.println("Usage: java " + name + " [-sid specialid]* [-hash|-nohash] [-switch] [-test|-copy] -src sourcedb[:port] -dst targetdb[:port]");
 		System.out.println("");
 		System.out.println("Default: -nohash  does not use hashed values of graph identifiers in the target database"); 
+		System.out.println("         -switch  use [+] instead of [@] for business names");
 		System.out.println("         -test    does not perform actual insert operations in the target database");
 		System.exit(1);
 	}
@@ -300,12 +329,15 @@ public class MongoDBStoreCombineUtil
 		Integer srcPort = null;
 		String  dstHost = null;
 		Integer dstPort = null;
+		Boolean switchC = null;
 		int     i;
 		for (i = 0; i < args.length; i++) {
 			if ("-nohash".equals(args[i])) {
 				useHash = Boolean.FALSE;
 			} else if ("-hash".equals(args[i])) {
 				useHash = Boolean.TRUE;
+			} else if ("-switch".equals(args[i])) {
+				switchC = Boolean.TRUE;
 			} else if ("-copy".equals(args[i])) {
 				dryRun = Boolean.FALSE;
 			} else if ("-test".equals(args[i])) {
@@ -340,6 +372,7 @@ public class MongoDBStoreCombineUtil
 			usage();
 		}
 		MongoDBStoreCombineUtil util = new MongoDBStoreCombineUtil(srcHost, srcPort, dstHost, dstPort, useHash, dryRun);
+		util.setSwitchFlag(switchC);
 		try {
 			if (util.init()) {
 				util.copy();

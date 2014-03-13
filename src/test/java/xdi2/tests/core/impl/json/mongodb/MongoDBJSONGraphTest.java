@@ -3,6 +3,7 @@ package xdi2.tests.core.impl.json.mongodb;
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
 import xdi2.core.impl.json.mongodb.MongoDBJSONStore;
+import xdi2.core.impl.json.mongodb.MongoDBStore;
 import xdi2.tests.core.impl.AbstractGraphTest;
 
 public class MongoDBJSONGraphTest extends AbstractGraphTest {
@@ -14,6 +15,7 @@ public class MongoDBJSONGraphTest extends AbstractGraphTest {
 	static {
 		
 		graphFactory.setHost(HOST);
+		graphFactory.setMockFlag(Boolean.TRUE);
 	}
 
 	@Override
@@ -21,7 +23,7 @@ public class MongoDBJSONGraphTest extends AbstractGraphTest {
 
 		super.setUp();
 
-		MongoDBJSONStore.cleanup(HOST);
+		MongoDBStore.cleanup(HOST, null, Boolean.TRUE);
 	}
 
 	@Override
@@ -29,7 +31,7 @@ public class MongoDBJSONGraphTest extends AbstractGraphTest {
 
 		super.tearDown();
 
-		MongoDBJSONStore.cleanup(HOST);
+		MongoDBStore.cleanup(HOST, null, Boolean.TRUE);
 	}
 
 	@Override

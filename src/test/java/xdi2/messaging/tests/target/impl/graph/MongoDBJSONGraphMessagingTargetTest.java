@@ -5,6 +5,7 @@ import java.io.IOException;
 import xdi2.core.Graph;
 import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
 import xdi2.core.impl.json.mongodb.MongoDBJSONStore;
+import xdi2.core.impl.json.mongodb.MongoDBStore;
 
 public class MongoDBJSONGraphMessagingTargetTest extends AbstractGraphMessagingTargetTest {
 
@@ -13,16 +14,15 @@ public class MongoDBJSONGraphMessagingTargetTest extends AbstractGraphMessagingT
 	public static final String HOST = "localhost";
 
 	static {
-
 		graphFactory.setHost(HOST);
+		graphFactory.setMockFlag(Boolean.TRUE);
 	}
 
 	@Override
 	protected void setUp() throws Exception {
 
 		super.setUp();
-
-		MongoDBJSONStore.cleanup(HOST);
+		MongoDBStore.cleanup(HOST, null, Boolean.TRUE);
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class MongoDBJSONGraphMessagingTargetTest extends AbstractGraphMessagingT
 
 		super.tearDown();
 
-		MongoDBJSONStore.cleanup(HOST);
+		MongoDBStore.cleanup(HOST, null, Boolean.TRUE);
 	}
 
 	@Override

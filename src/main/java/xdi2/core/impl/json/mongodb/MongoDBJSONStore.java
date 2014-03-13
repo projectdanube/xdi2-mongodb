@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.codec.binary.Base64;
 
 import xdi2.core.exceptions.Xdi2RuntimeException;
@@ -31,39 +34,53 @@ import com.mongodb.util.JSON;
 
 public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 
+	private static final Logger log = LoggerFactory.getLogger(MongoDBJSONStore.class);
 	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
 
-	private MongoClient mongoClient;
-	private DB db;
-	private DBCollection dbCollection;
+	private MongoDBStore	dbStore;
+	private String		identifier;
 
-	public MongoDBJSONStore(MongoClient mongoClient, DB db) {
+	public MongoDBJSONStore(MongoDBStore dbStore, String identifier) {
 
-		this.mongoClient = mongoClient;
-		this.db = db;
-
-		this.dbCollection = null;
+		this.dbStore = dbStore;
+		this.identifier = identifier;
 	}
 
 	@Override
-	public void init() throws IOException {
-
-		this.dbCollection = this.db.getCollection("contexts");
-	}
+	public void init() {}
 
 	@Override
-	public void close() {
+	public void close() {}
 
-		this.mongoClient.close();
+	/**
+	 * Constructs the search <code>BasicDBObject</code> by combiniing graph identifier and the secondary key.
+	 *
+	 * @param key the secondary key of a XDI2 graph.
+	 * @return a <code>BasicDBObject</code> combiniing graph identifier and the secondary key.
+	 */
+	private BasicDBObject getKey(Object key) {
+
+		return new BasicDBObject(MongoDBStore.XDI2_OBJ_KEY, key).append(MongoDBStore.XDI2_OBJ_ID, this.identifier);
 	}
 
 	@Override
 	public JsonObject load(String id) throws IOException {
 
-		DBObject object = this.dbCollection.findOne(new BasicDBObject("_id", id));
-		if (object == null) return null;
+		if (log.isTraceEnabled()) {
+			log.trace("load() - " + this.identifier + " " + id);
+		}
+
+		DBObject object = this.dbStore.getCollection().findOne(this.getKey(id));
+
+		if (log.isTraceEnabled()) {
+			log.trace("load() - " + this.identifier + " " + id + " = " + object);
+		}
 
 		JsonObject jsonObject = fromMongoObject(object);
+
+		if (log.isTraceEnabled()) {
+			log.trace("load() - " + this.identifier + " " + id + " = " + jsonObject);
+		}
 
 		return jsonObject;
 	}
@@ -71,7 +88,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	@Override
 	public Map<String, JsonObject> loadWithPrefix(String id) throws IOException {
 
-		DBCursor cursor = this.dbCollection.find(new BasicDBObject("_id", toMongoStartsWithRegex(id)));
+		DBCursor cursor = this.dbStore.getCollection().find(this.getKey(toMongoStartsWithRegex(id)));
 		if (cursor == null) return Collections.emptyMap();
 
 		Map<String, JsonObject> jsonObjects = new HashMap<String, JsonObject> ();
@@ -80,7 +97,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 
 			DBObject object = cursor.next();
 
-			jsonObjects.put((String) object.get("_id"), fromMongoObject(object));
+			jsonObjects.put((String) object.get(MongoDBStore.XDI2_OBJ_KEY), fromMongoObject(object));
 		}
 
 		cursor.close();
@@ -91,49 +108,76 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	@Override
 	public void save(String id, JsonObject jsonObject) throws IOException {
 
+		if (log.isTraceEnabled()) {
+			log.trace("save() - " + this.identifier + " " + id + " " + jsonObject);
+		}
+
 		DBObject object = toMongoObject(jsonObject, id);
 
-		this.dbCollection.save(object);
+		if (log.isTraceEnabled()) {
+			log.trace("save() - " + this.identifier + " " + id + " " + object);
+		}
+
+		this.dbStore.getCollection().save(object);
 	}
 
 	@Override
 	public void saveToArray(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
 
-		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$addToSet", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
+		if (log.isTraceEnabled()) {
+			log.trace("saveToArray() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
+		}
+
+		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$addToSet", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
 	}
 
 	@Override
 	public void saveToObject(String id, String key, JsonElement jsonElement) throws IOException {
 
-		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$set", new BasicDBObject(toMongoKey(key), toMongoElement(jsonElement))), true, false);
+		if (log.isTraceEnabled()) {
+			log.trace("saveToObject() - " + this.identifier + " " + id + " " + key + " " + jsonElement);
+		}
+
+		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$set", new BasicDBObject(toMongoKey(key), toMongoElement(jsonElement))), true, false);
 	}
 
 	@Override
 	public void delete(final String id) throws IOException {
 
-		this.dbCollection.remove(new BasicDBObject("_id", toMongoStartsWithRegex(id)));
+		if (log.isTraceEnabled()) {
+			log.trace("delete() - " + this.identifier + " " + id);
+		}
+
+		this.dbStore.getCollection().remove(this.getKey(toMongoStartsWithRegex(id)));
 	}
 
 	@Override
 	public void deleteFromArray(String id, String key, JsonPrimitive jsonPrimitive) throws IOException {
 
-		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$pull", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
+		if (log.isTraceEnabled()) {
+			log.trace("deleteFromArray() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
+		}
+
+		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$pull", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
 	}
 
 	@Override
 	public void deleteFromObject(String id, String key) throws IOException {
 
-		this.dbCollection.update(new BasicDBObject("_id", id), new BasicDBObject("$unset", new BasicDBObject(toMongoKey(key), "")), false, false);
+		if (log.isTraceEnabled()) {
+			log.trace("deleteFromObject() - " + this.identifier + " " + id + " " + key);
+		}
+
+		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$unset", new BasicDBObject(toMongoKey(key), "")), false, false);
 	}
 
 	/*
 	 * Helper methods
 	 */
 
-	private static DBObject toMongoObject(JsonObject jsonObject, String id) {
+	private DBObject toMongoObject(JsonObject jsonObject, String id) {
 
-		DBObject object = new BasicDBObject();
-
+		DBObject object = this.getKey(id);
 		for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
 
 			String key = entry.getKey();
@@ -142,33 +186,34 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 			object.put(toMongoKey(key), toMongoElement(value));
 		}
 
-		object.put("_id", id);
-
 		return object;
 	}
 
-	private static JsonObject fromMongoObject(DBObject object) throws IOException {
+	private JsonObject fromMongoObject(DBObject object) throws IOException {
+
+		if (object == null) {
+			return null;
+		}
 
 		JsonObject jsonObject = new JsonObject();
 
 		for (String key : object.keySet()) {
-
+			if (key.equals(MongoDBStore.XDI2_OBJ_ID) || key.equals(MongoDBStore.XDI2_OBJ_KEY) || key.equals("_id")) {
+				continue;
+			}
 			Object value = object.get(key);
-
-			if (key.equals("_id")) continue;
-
 			jsonObject.add(fromMongoKey(key), fromMongoElement(value));
 		}
 
 		return jsonObject;
 	}
 
-	private static Object toMongoElement(JsonElement jsonElement) {
+	private Object toMongoElement(JsonElement jsonElement) {
 
 		return JSON.parse(gson.toJson(jsonElement));
 	}
 
-	private static JsonElement fromMongoElement(Object object) throws IOException {
+	private JsonElement fromMongoElement(Object object) throws IOException {
 
 		StringBuilder builder = new StringBuilder();
 		JSON.serialize(object, builder);
@@ -176,34 +221,21 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		return gson.getAdapter(JsonArray.class).fromJson("[" + builder.toString() + "]").get(0);
 	}
 
-	private static String toMongoKey(String key) {
+	private String toMongoKey(String key) {
 
 		if (key.startsWith("$")) key = "\\" + key;
 
 		return key;
 	}
 
-	private static String fromMongoKey(String key) {
+	private String fromMongoKey(String key) {
 
 		if (key.startsWith("\\$")) key = key.substring(1);
 
 		return key;
 	}
 
-	static String toMongoDBName(String identifier) {
-
-		try {
-
-			MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
-			return new String(Base64.encodeBase64URLSafe(digest.digest(identifier.getBytes("UTF-8"))));
-		} catch (Exception ex) {
-
-			throw new Xdi2RuntimeException(ex);
-		}
-	}
-
-	private static Pattern toMongoStartsWithRegex(String string) {
+	private Pattern toMongoStartsWithRegex(String string) {
 
 		StringBuilder buffer = new StringBuilder();
 
@@ -227,31 +259,5 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		buffer.append(".*");
 
 		return Pattern.compile(buffer.toString());
-	}
-
-	public static void cleanup() {
-
-		cleanup(null, null);
-	}
-
-	public static void cleanup(String host) {
-
-		cleanup(host, null);
-	}
-
-	public static void cleanup(String host, Integer port) {
-
-		try {
-
-			MongoClient mongoClient = port == null ? (host == null ? new MongoClient() : new MongoClient(host)) : new MongoClient(host, port.intValue());
-
-			List<String> databaseNames = mongoClient.getDatabaseNames();
-			for (String databaseName : databaseNames) mongoClient.dropDatabase(databaseName);
-
-			mongoClient.close();
-		} catch (Exception ex) {
-
-			throw new RuntimeException(ex.getMessage(), ex);
-		}
 	}
 }

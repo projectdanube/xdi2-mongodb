@@ -2,7 +2,6 @@ package xdi2.tests.core.impl.json.mongodb;
 
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
-import xdi2.core.impl.json.mongodb.MongoDBJSONStore;
 import xdi2.core.impl.json.mongodb.MongoDBStore;
 import xdi2.tests.core.impl.AbstractGraphTest;
 

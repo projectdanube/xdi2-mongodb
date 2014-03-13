@@ -84,8 +84,8 @@ public class MongoDBStore {
 			}
 			DBCollection dbCollection = db.getCollection(XDI2_DBCOLLECTION);
 			BasicDBObject idx = new BasicDBObject();
-			idx.put(XDI2_OBJ_KEY, 1);
-			idx.put(XDI2_OBJ_ID , 1);
+			idx.put(XDI2_OBJ_KEY, Integer.valueOf(1));
+			idx.put(XDI2_OBJ_ID , Integer.valueOf(1));
 			dbCollection.ensureIndex(idx, XDI2_OBJ_INDEX, true);
 			rtn = new MongoDBStore(client, db, dbCollection);
 			mongoDBStores.put(key, rtn);

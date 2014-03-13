@@ -1,22 +1,18 @@
 package xdi2.core.impl.json.mongodb.util;
 
 import java.net.UnknownHostException;
-import java.security.MessageDigest;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.commons.codec.binary.Base64;
+import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
+import xdi2.core.impl.json.mongodb.MongoDBStore;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-
-import xdi2.core.impl.json.mongodb.MongoDBStore;
-import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
 
 /**
  * This <code>MongoDBStoreCombineUtil</code> class combines the existing
@@ -283,8 +279,8 @@ public class MongoDBStoreCombineUtil
 		int totalRecords = 0;
 		DBCollection dst = this.dstClient.getDB(MongoDBStore.XDI2_DBNAME).getCollection(MongoDBStore.XDI2_DBCOLLECTION);
 		BasicDBObject idx = new BasicDBObject();
-		idx.put(MongoDBStore.XDI2_OBJ_KEY, 1);
-		idx.put(MongoDBStore.XDI2_OBJ_ID , 1);
+		idx.put(MongoDBStore.XDI2_OBJ_KEY, Integer.valueOf(1));
+		idx.put(MongoDBStore.XDI2_OBJ_ID , Integer.valueOf(1));
 		dst.ensureIndex(idx, MongoDBStore.XDI2_OBJ_INDEX, true);
 		long dstCount = dst.getCount();
 		System.out.println("Old Records in Target: " + dstCount);

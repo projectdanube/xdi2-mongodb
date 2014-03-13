@@ -1,10 +1,8 @@
 package xdi2.core.impl.json.mongodb;
 
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -12,9 +10,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.codec.binary.Base64;
-
-import xdi2.core.exceptions.Xdi2RuntimeException;
 import xdi2.core.impl.json.AbstractJSONStore;
 import xdi2.core.impl.json.JSONStore;
 
@@ -25,11 +20,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
 
 public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {

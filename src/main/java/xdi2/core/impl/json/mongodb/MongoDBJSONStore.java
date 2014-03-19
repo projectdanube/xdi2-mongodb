@@ -231,6 +231,8 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 
 		StringBuilder buffer = new StringBuilder();
 
+		buffer.append("^");
+
 		buffer.append(string
 				.replace("+", "\\+")
 				.replace("=", "\\=")

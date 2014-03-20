@@ -58,11 +58,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		MongoDBStore dbStore = MongoDBStore.getMongoDBStore(this.getHost(), this.getPort(), this.getMockFlag());
 
 		JSONStore jsonStore = new MongoDBJSONStore(dbStore, identifier);
-		if (jsonStore != null) {
-			jsonStore.init();
-		} else {
-			log.error("openJSONStore for identifier " + identifier + " failed");
-		}
+		jsonStore.init();
 
 		return jsonStore;
 	}

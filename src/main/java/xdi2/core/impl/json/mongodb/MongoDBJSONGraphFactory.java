@@ -1,17 +1,20 @@
 package xdi2.core.impl.json.mongodb;
 
-import java.util.UUID;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.json.AbstractJSONGraphFactory;
 import xdi2.core.impl.json.JSONStore;
+
+import com.mongodb.MongoClientOptions;
+import com.mongodb.ServerAddress;
 
 /**
  * GraphFactory that creates JSON graphs in MongoDB.
@@ -29,6 +32,8 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 	private Integer port;
 	private Boolean mockFlag;
 	private Boolean hashIdentifierFlag;
+	private List<ServerAddress> replicaSet;
+	private MongoClientOptions mongoClientOptions;
 
 	public MongoDBJSONGraphFactory() { 
 
@@ -55,10 +60,20 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 			identifier = hashIdentifier(identifier);
 		}
 
-		MongoDBStore dbStore = MongoDBStore.getMongoDBStore(this.getHost(), this.getPort(), this.getMockFlag());
+		MongoDBStore dbStore = null;
+		
+		if (replicaSet != null) {
+		    dbStore = MongoDBStore.getMongoDBStoreFromReplicaSet(replicaSet, this.getMockFlag(), mongoClientOptions);
+		} else {
+		    dbStore = MongoDBStore.getMongoDBStore(this.getHost(), this.getPort(), this.getMockFlag());
+		}
 
 		JSONStore jsonStore = new MongoDBJSONStore(dbStore, identifier);
-		jsonStore.init();
+		if (jsonStore != null) {
+			jsonStore.init();
+		} else {
+			log.error("openJSONStore for identifier " + identifier + " failed");
+		}
 
 		return jsonStore;
 	}
@@ -112,4 +127,34 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 	public void setHashIdentifierFlag(Boolean hashIdentifierFlag) {
 		this.hashIdentifierFlag = hashIdentifierFlag;
 	}
+
+    /**
+     * @return the replicaSet
+     */
+    public List<ServerAddress> getReplicaSet() {
+        return replicaSet;
+    }
+
+    /**
+     * @param replicaSet the replicaSet to set
+     */
+    public void setReplicaSet(List<ServerAddress> replicaSet) {
+        this.replicaSet = replicaSet;
+    }
+
+    /**
+     * @return the mongoClientOptions
+     */
+    public MongoClientOptions getMongoClientOptions() {
+        return mongoClientOptions;
+    }
+
+    /**
+     * @param mongoClientOptions the mongoClientOptions to set
+     */
+    public void setMongoClientOptions(MongoClientOptions mongoClientOptions) {
+        this.mongoClientOptions = mongoClientOptions;
+    }
+
+
 }

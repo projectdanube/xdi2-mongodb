@@ -1,15 +1,17 @@
 package xdi2.core.impl.json.mongodb;
 
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.ServerAddress;
 
 /**
  * This <code>MongoDBStore</code> defines MongoDB related objects used
@@ -27,11 +29,13 @@ public class MongoDBStore {
 	public  static final String XDI2_DBNAME_MOCK  = "xdi2graph_mock";
 	public  static final String XDI2_DBCOLLECTION = "contexts";
 
-	private MongoClient		client;
-	private DB			db;
-	private DBCollection		dbCollection;
+	private MongoClient client;
+	private DB db;
+	private DBCollection dbCollection;
 
 	private static HashMap<String, MongoDBStore> mongoDBStores = new HashMap<String, MongoDBStore>();
+
+
 
 	private MongoDBStore(MongoClient client, DB db, DBCollection dbCollection) {
 		this.client = client;
@@ -95,6 +99,39 @@ public class MongoDBStore {
 		}
 		return rtn;
 	}
+	
+	
+	public static synchronized MongoDBStore getMongoDBStoreFromReplicaSet(List<ServerAddress> replicaSet,
+	        Boolean mockFlag, MongoClientOptions clientOptions) {
+
+        String key = getKey(replicaSet.hashCode() + "", null);
+        MongoDBStore rtn = mongoDBStores.get(key);
+        if (rtn != null) {
+            return rtn;
+        }
+                      
+        MongoClient client = null;
+       
+        client = new MongoClient(replicaSet, clientOptions);
+        
+        DB db = null;
+        if (Boolean.TRUE.equals(mockFlag)) {
+            db = client.getDB(XDI2_DBNAME_MOCK);
+        } else {
+            db = client.getDB(XDI2_DBNAME);
+        }
+        
+        DBCollection dbCollection = db.getCollection(XDI2_DBCOLLECTION);
+        BasicDBObject idx = new BasicDBObject();
+        idx.put(XDI2_OBJ_KEY, Integer.valueOf(1));
+        idx.put(XDI2_OBJ_ID, Integer.valueOf(1));
+        dbCollection.ensureIndex(idx, XDI2_OBJ_INDEX, true);
+        rtn = new MongoDBStore(client, db, dbCollection);
+        mongoDBStores.put(key, rtn);
+
+        return rtn;
+    }
+
 
 	public static void cleanup() {
 

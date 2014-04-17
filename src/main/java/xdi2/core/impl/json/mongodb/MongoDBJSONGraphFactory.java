@@ -69,11 +69,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		}
 
 		JSONStore jsonStore = new MongoDBJSONStore(dbStore, identifier);
-		if (jsonStore != null) {
-			jsonStore.init();
-		} else {
-			log.error("openJSONStore for identifier " + identifier + " failed");
-		}
+		jsonStore.init();
 
 		return jsonStore;
 	}

@@ -48,10 +48,6 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 	@Override
 	protected JSONStore openJSONStore(String identifier) throws IOException {
 
-		if (identifier == null) {
-			identifier = UUID.randomUUID().toString();
-		}
-
 		if (log.isTraceEnabled()) {
 			log.trace("openJSONStore for identifier " + identifier);
 		}

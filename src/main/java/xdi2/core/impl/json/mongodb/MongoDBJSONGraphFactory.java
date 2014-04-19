@@ -3,7 +3,6 @@ package xdi2.core.impl.json.mongodb;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;

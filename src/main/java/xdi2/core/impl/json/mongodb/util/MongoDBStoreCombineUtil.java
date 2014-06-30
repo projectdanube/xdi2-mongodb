@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
-import xdi2.core.impl.json.mongodb.MongoDBStore;
+import xdi2.core.impl.json.mongodb.MongoDBJSONStore;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -250,8 +250,8 @@ public class MongoDBStoreCombineUtil
 					for (DBObject obj : list) {
 						Object key = obj.get("_id");
 						obj.removeField("_id");
-						obj.put(MongoDBStore.XDI2_OBJ_KEY, key);
-						obj.put(MongoDBStore.XDI2_OBJ_ID , identifier);
+						obj.put(MongoDBJSONStore.XDI2_OBJ_KEY, key);
+						obj.put(MongoDBJSONStore.XDI2_OBJ_ID , identifier);
 						dst.insert(obj);
 						rtn++;
 					}
@@ -277,11 +277,11 @@ public class MongoDBStoreCombineUtil
 	public void copy() {
 		int totalGraphs  = 0;
 		int totalRecords = 0;
-		DBCollection dst = this.dstClient.getDB(MongoDBStore.XDI2_DBNAME).getCollection(MongoDBStore.XDI2_DBCOLLECTION);
+		DBCollection dst = this.dstClient.getDB(MongoDBJSONStore.XDI2_DBNAME).getCollection(MongoDBJSONStore.XDI2_DBCOLLECTION);
 		BasicDBObject idx = new BasicDBObject();
-		idx.put(MongoDBStore.XDI2_OBJ_KEY, Integer.valueOf(1));
-		idx.put(MongoDBStore.XDI2_OBJ_ID , Integer.valueOf(1));
-		dst.ensureIndex(idx, MongoDBStore.XDI2_OBJ_INDEX, true);
+		idx.put(MongoDBJSONStore.XDI2_OBJ_KEY, Integer.valueOf(1));
+		idx.put(MongoDBJSONStore.XDI2_OBJ_ID , Integer.valueOf(1));
+		dst.ensureIndex(idx, MongoDBJSONStore.XDI2_OBJ_INDEX, true);
 		long dstCount = dst.getCount();
 		System.out.println("Old Records in Target: " + dstCount);
 
@@ -293,7 +293,7 @@ public class MongoDBStoreCombineUtil
 				if (db.length() != dbNameLength) {
 					continue;
 				}
-				DBCollection src = this.srcClient.getDB(db).getCollection(MongoDBStore.XDI2_DBCOLLECTION);
+				DBCollection src = this.srcClient.getDB(db).getCollection(MongoDBJSONStore.XDI2_DBCOLLECTION);
 				System.out.print("Move graph " + totalGraphs + " " + db + " ... ");
 				int n = this.copy(db, src, dst);
 				totalGraphs++;

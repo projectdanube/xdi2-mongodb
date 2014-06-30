@@ -2,6 +2,7 @@ package xdi2.core.impl.json.mongodb;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
@@ -12,6 +13,7 @@ import xdi2.core.GraphFactory;
 import xdi2.core.impl.json.AbstractJSONGraphFactory;
 import xdi2.core.impl.json.JSONStore;
 
+import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
 
@@ -31,6 +33,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 	private Integer port;
 	private Boolean mockFlag;
 	private Boolean hashIdentifierFlag;
+	private Boolean singleDatabaseFlag;
 	private List<ServerAddress> replicaSet;
 	private MongoClientOptions mongoClientOptions;
 
@@ -42,6 +45,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		this.port = DEFAULT_PORT;
 		this.mockFlag = Boolean.FALSE;
 		this.hashIdentifierFlag = Boolean.FALSE;
+		this.singleDatabaseFlag = Boolean.TRUE;
 	}
 
 	@Override
@@ -55,18 +59,70 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 			identifier = hashIdentifier(identifier);
 		}
 
-		MongoDBStore dbStore = null;
-		
+		MongoClient mongoClient = null;
+
 		if (replicaSet != null) {
-		    dbStore = MongoDBStore.getMongoDBStoreFromReplicaSet(replicaSet, this.getMockFlag(), mongoClientOptions);
+			mongoClient = getMongoClientFromReplicaSet(replicaSet, mongoClientOptions);
 		} else {
-		    dbStore = MongoDBStore.getMongoDBStore(this.getHost(), this.getPort(), this.getMockFlag());
+			mongoClient = getMongoClient(this.getHost(), this.getPort());
 		}
 
-		JSONStore jsonStore = new MongoDBJSONStore(dbStore, identifier);
+		JSONStore jsonStore = new MongoDBJSONStore(mongoClient, identifier, this.getMockFlag(), this.getSingleDatabaseFlag());
 		jsonStore.init();
 
 		return jsonStore;
+	}
+
+	private static HashMap<String, MongoClient> mongoClients = new HashMap<String, MongoClient>();
+
+	private static String getMongoClientKey(String host, Integer port) {
+		String key = host;
+		if (port != null) {
+			key = key + ":" + port;
+		}
+		return key;
+	}
+
+	public static synchronized MongoClient getMongoClient(String host, Integer port) {
+		if (log.isTraceEnabled()) {
+			log.trace("getMongoClient() " + host + " " + port);
+		}
+		String key = getMongoClientKey(host, port);
+		MongoClient rtn = mongoClients.get(key);
+		if (rtn != null) {
+			return rtn;
+		}
+		try
+		{
+			MongoClient client = null;
+			if (port != null) {
+				client = new MongoClient(host, port.intValue());
+			} else {
+				client = new MongoClient(host);
+			}
+			rtn = client;
+			mongoClients.put(key, rtn);
+		} catch (java.net.UnknownHostException e) {
+			log.error("getMongoClient() " + host + " " + port + " failed - " + e, e);
+			rtn = null;
+		}
+		return rtn;
+	}
+
+	public static synchronized MongoClient getMongoClientFromReplicaSet(List<ServerAddress> replicaSet, MongoClientOptions clientOptions) {
+
+		String key = getMongoClientKey(replicaSet.hashCode() + "", null);
+		MongoClient rtn = mongoClients.get(key);
+		if (rtn != null) {
+			return rtn;
+		}
+
+		MongoClient client = null;
+		client = new MongoClient(replicaSet, clientOptions);
+		rtn = client;
+		mongoClients.put(key, rtn);
+
+		return rtn;
 	}
 
 	public static String hashIdentifier(String identifier) {
@@ -119,33 +175,41 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		this.hashIdentifierFlag = hashIdentifierFlag;
 	}
 
-    /**
-     * @return the replicaSet
-     */
-    public List<ServerAddress> getReplicaSet() {
-        return replicaSet;
-    }
+	public Boolean getSingleDatabaseFlag() {
+		return this.singleDatabaseFlag;
+	}
 
-    /**
-     * @param replicaSet the replicaSet to set
-     */
-    public void setReplicaSet(List<ServerAddress> replicaSet) {
-        this.replicaSet = replicaSet;
-    }
+	public void setSingleDatabaseFlag(Boolean singleDatabaseFlag) {
+		this.singleDatabaseFlag = singleDatabaseFlag;
+	}
 
-    /**
-     * @return the mongoClientOptions
-     */
-    public MongoClientOptions getMongoClientOptions() {
-        return mongoClientOptions;
-    }
+	/**
+	 * @return the replicaSet
+	 */
+	public List<ServerAddress> getReplicaSet() {
+		return replicaSet;
+	}
 
-    /**
-     * @param mongoClientOptions the mongoClientOptions to set
-     */
-    public void setMongoClientOptions(MongoClientOptions mongoClientOptions) {
-        this.mongoClientOptions = mongoClientOptions;
-    }
+	/**
+	 * @param replicaSet the replicaSet to set
+	 */
+	public void setReplicaSet(List<ServerAddress> replicaSet) {
+		this.replicaSet = replicaSet;
+	}
+
+	/**
+	 * @return the mongoClientOptions
+	 */
+	public MongoClientOptions getMongoClientOptions() {
+		return mongoClientOptions;
+	}
+
+	/**
+	 * @param mongoClientOptions the mongoClientOptions to set
+	 */
+	public void setMongoClientOptions(MongoClientOptions mongoClientOptions) {
+		this.mongoClientOptions = mongoClientOptions;
+	}
 
 
 }

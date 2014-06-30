@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import xdi2.core.Graph;
 import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
-import xdi2.core.impl.json.mongodb.MongoDBStore;
+import xdi2.core.impl.json.mongodb.MongoDBJSONStore;
 
 public class MongoDBJSONGraphMessagingTargetTest extends AbstractGraphMessagingTargetTest {
 
@@ -21,7 +21,7 @@ public class MongoDBJSONGraphMessagingTargetTest extends AbstractGraphMessagingT
 	protected void setUp() throws Exception {
 
 		super.setUp();
-		MongoDBStore.cleanup(HOST, null, Boolean.TRUE);
+		MongoDBJSONStore.cleanup(HOST, null, Boolean.TRUE);
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class MongoDBJSONGraphMessagingTargetTest extends AbstractGraphMessagingT
 
 		super.tearDown();
 
-		MongoDBStore.cleanup(HOST, null, Boolean.TRUE);
+		MongoDBJSONStore.cleanup(HOST, null, Boolean.TRUE);
 	}
 
 	@Override

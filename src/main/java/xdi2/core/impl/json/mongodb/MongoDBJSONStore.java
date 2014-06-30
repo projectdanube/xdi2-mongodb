@@ -3,6 +3,7 @@ package xdi2.core.impl.json.mongodb;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -20,8 +21,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
 
 public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
@@ -29,17 +33,50 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	private static final Logger log = LoggerFactory.getLogger(MongoDBJSONStore.class);
 	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
 
-	private MongoDBStore	dbStore;
+	public  static final String XDI2_OBJ_ID       = "id";
+	public  static final String XDI2_OBJ_KEY      = "key";
+	public  static final String XDI2_OBJ_INDEX    = "idx";
+
+	public  static final String XDI2_DBNAME       = "xdi2graph";
+	public  static final String XDI2_DBNAME_MOCK  = "xdi2graph_mock";
+	public  static final String XDI2_DBCOLLECTION = "contexts";
+
+	private MongoClient	mongoClient;
 	private String		identifier;
+	private Boolean mockFlag;
+	private Boolean singleDatabaseFlag;
 
-	public MongoDBJSONStore(MongoDBStore dbStore, String identifier) {
+	private DBCollection dbCollection;
 
-		this.dbStore = dbStore;
+	public MongoDBJSONStore(MongoClient mongoClient, String identifier, Boolean mockFlag, Boolean singleDatabaseFlag) {
+
+		this.mongoClient = mongoClient;
 		this.identifier = identifier;
+		this.mockFlag = mockFlag;
+		this.singleDatabaseFlag = singleDatabaseFlag;
 	}
 
 	@Override
-	public void init() {}
+	public void init() {
+
+		DB db = null;
+		if (Boolean.TRUE.equals(mockFlag)) {
+			db = this.mongoClient.getDB(XDI2_DBNAME_MOCK);
+		} else {
+			if (Boolean.TRUE.equals(singleDatabaseFlag)) {
+				db = this.mongoClient.getDB(XDI2_DBNAME);
+			} else {
+				db = this.mongoClient.getDB(this.identifier);
+			}
+		}
+		this.dbCollection = db.getCollection(XDI2_DBCOLLECTION);
+		if (Boolean.TRUE.equals(singleDatabaseFlag)) {
+			BasicDBObject idx = new BasicDBObject();
+			idx.put(XDI2_OBJ_KEY, Integer.valueOf(1));
+			idx.put(XDI2_OBJ_ID , Integer.valueOf(1));
+			dbCollection.ensureIndex(idx, XDI2_OBJ_INDEX, true);
+		}
+	}
 
 	@Override
 	public void close() {}
@@ -52,7 +89,11 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	 */
 	private BasicDBObject getKey(Object key) {
 
-		return new BasicDBObject(MongoDBStore.XDI2_OBJ_KEY, key).append(MongoDBStore.XDI2_OBJ_ID, this.identifier);
+		if (this.singleDatabaseFlag) {
+			return new BasicDBObject(XDI2_OBJ_KEY, key).append(XDI2_OBJ_ID, this.identifier);
+		} else {
+			return new BasicDBObject("_id", key);
+		}
 	}
 
 	@Override
@@ -62,7 +103,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 			log.trace("load() - " + this.identifier + " " + id);
 		}
 
-		DBObject object = this.dbStore.getCollection().findOne(this.getKey(id));
+		DBObject object = this.dbCollection.findOne(this.getKey(id));
 
 		if (log.isTraceEnabled()) {
 			log.trace("load() - " + this.identifier + " " + id + " = " + object);
@@ -80,7 +121,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	@Override
 	public Map<String, JsonObject> loadWithPrefix(String id) throws IOException {
 
-		DBCursor cursor = this.dbStore.getCollection().find(this.getKey(toMongoStartsWithRegex(id)));
+		DBCursor cursor = this.dbCollection.find(this.getKey(toMongoStartsWithRegex(id)));
 		if (cursor == null) return Collections.emptyMap();
 
 		Map<String, JsonObject> jsonObjects = new HashMap<String, JsonObject> ();
@@ -89,7 +130,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 
 			DBObject object = cursor.next();
 
-			jsonObjects.put((String) object.get(MongoDBStore.XDI2_OBJ_KEY), fromMongoObject(object));
+			jsonObjects.put((String) object.get(XDI2_OBJ_KEY), fromMongoObject(object));
 		}
 
 		cursor.close();
@@ -110,7 +151,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 			log.trace("save() - " + this.identifier + " " + id + " " + object);
 		}
 
-		this.dbStore.getCollection().save(object);
+		this.dbCollection.save(object);
 	}
 
 	@Override
@@ -120,7 +161,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 			log.trace("saveToArray() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
 		}
 
-		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$addToSet", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
+		this.dbCollection.update(this.getKey(id), new BasicDBObject("$addToSet", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
 	}
 
 	@Override
@@ -130,7 +171,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 			log.trace("saveToObject() - " + this.identifier + " " + id + " " + key + " " + jsonElement);
 		}
 
-		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$set", new BasicDBObject(toMongoKey(key), toMongoElement(jsonElement))), true, false);
+		this.dbCollection.update(this.getKey(id), new BasicDBObject("$set", new BasicDBObject(toMongoKey(key), toMongoElement(jsonElement))), true, false);
 	}
 
 	@Override
@@ -140,7 +181,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 			log.trace("delete() - " + this.identifier + " " + id);
 		}
 
-		this.dbStore.getCollection().remove(this.getKey(toMongoStartsWithRegex(id)));
+		this.dbCollection.remove(this.getKey(toMongoStartsWithRegex(id)));
 	}
 
 	@Override
@@ -150,7 +191,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 			log.trace("deleteFromArray() - " + this.identifier + " " + id + " " + key + " " + jsonPrimitive);
 		}
 
-		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$pull", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
+		this.dbCollection.update(this.getKey(id), new BasicDBObject("$pull", new BasicDBObject(toMongoKey(key), toMongoElement(jsonPrimitive))), true, false);
 	}
 
 	@Override
@@ -160,7 +201,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 			log.trace("deleteFromObject() - " + this.identifier + " " + id + " " + key);
 		}
 
-		this.dbStore.getCollection().update(this.getKey(id), new BasicDBObject("$unset", new BasicDBObject(toMongoKey(key), "")), false, false);
+		this.dbCollection.update(this.getKey(id), new BasicDBObject("$unset", new BasicDBObject(toMongoKey(key), "")), false, false);
 	}
 
 	/*
@@ -190,7 +231,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		JsonObject jsonObject = new JsonObject();
 
 		for (String key : object.keySet()) {
-			if (key.equals(MongoDBStore.XDI2_OBJ_ID) || key.equals(MongoDBStore.XDI2_OBJ_KEY) || key.equals("_id")) {
+			if (key.equals(XDI2_OBJ_ID) || key.equals(XDI2_OBJ_KEY) || key.equals("_id")) {
 				continue;
 			}
 			Object value = object.get(key);
@@ -253,5 +294,43 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		buffer.append(".*");
 
 		return Pattern.compile(buffer.toString());
+	}
+
+	public static void cleanup() {
+
+		cleanup(null, null, Boolean.FALSE);
+	}
+
+	public static void cleanup(String host) {
+
+		cleanup(host, null, Boolean.FALSE);
+	}
+
+	public static void cleanup(String host, Integer port, Boolean mockFlag) {
+
+		String dbName = null;
+		try {
+			MongoClient mongoClient = MongoDBJSONGraphFactory.getMongoClient(host, port);
+			List<String> databaseNames = mongoClient.getDatabaseNames();
+			for (String databaseName : databaseNames) {
+				dbName = databaseName;
+				if (Boolean.TRUE.equals(mockFlag)) {
+					if (XDI2_DBNAME_MOCK.equals(databaseName)) {
+						if (log.isTraceEnabled()) {
+							log.trace("cleanup() " + host + " " + port + " " + mockFlag + " db=" + databaseName);
+						}
+						mongoClient.dropDatabase(databaseName);
+					}
+				} else if(XDI2_DBNAME.equals(databaseName)) {
+					if (log.isTraceEnabled()) {
+						log.trace("cleanup ()" + host + " " + port + " " + mockFlag + " db=" + databaseName);
+					}
+					mongoClient.dropDatabase(databaseName);
+				}
+			}
+		} catch (Exception ex) {
+			log.error("cleanup() " + host + " " + port + " " + mockFlag + " db=" + dbName + " failed - " + ex, ex);
+			throw new RuntimeException(ex.getMessage(), ex);
+		}
 	}
 }

@@ -7,6 +7,7 @@ This is a project to use the [MongoDB](http://mongodb.org/) document database as
 
 * [Code Example](https://github.com/projectdanube/xdi2-mongodb/wiki/Code%20Example)
 * [Server Configuration Example](https://github.com/projectdanube/xdi2-mongodb/wiki/Server%20Configuration%20Example)
+* [Graph Factory Flags](https://github.com/projectdanube/xdi2-mongodb/wiki/Graph%20Factory%20Flags)
 
 ### How to build
 

@@ -26,7 +26,7 @@
 
 	<p class="subheader">Send a message to my XDI endpoint</p>
 
-	<form action="XDIMongoDB" method="post">
+	<form action="XDIMongoDB" method="post" accept-charset="UTF-8">
 
 		<textarea name="input" style="width: 100%" rows="12"><%= request.getAttribute("input") != null ? request.getAttribute("input") : "" %></textarea><br>
 

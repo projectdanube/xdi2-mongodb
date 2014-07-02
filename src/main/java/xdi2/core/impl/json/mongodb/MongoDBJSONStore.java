@@ -44,16 +44,16 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	private MongoClient	mongoClient;
 	private String		identifier;
 	private Boolean mockFlag;
-	private Boolean singleDatabaseFlag;
+	private Boolean sharedDatabaseFlag;
 
 	private DBCollection dbCollection;
 
-	public MongoDBJSONStore(MongoClient mongoClient, String identifier, Boolean mockFlag, Boolean singleDatabaseFlag) {
+	public MongoDBJSONStore(MongoClient mongoClient, String identifier, Boolean mockFlag, Boolean sharedDatabaseFlag) {
 
 		this.mongoClient = mongoClient;
 		this.identifier = identifier;
 		this.mockFlag = mockFlag;
-		this.singleDatabaseFlag = singleDatabaseFlag;
+		this.sharedDatabaseFlag = sharedDatabaseFlag;
 	}
 
 	@Override
@@ -63,14 +63,14 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 		if (Boolean.TRUE.equals(mockFlag)) {
 			db = this.mongoClient.getDB(XDI2_DBNAME_MOCK);
 		} else {
-			if (Boolean.TRUE.equals(singleDatabaseFlag)) {
+			if (Boolean.TRUE.equals(sharedDatabaseFlag)) {
 				db = this.mongoClient.getDB(XDI2_DBNAME);
 			} else {
 				db = this.mongoClient.getDB(this.identifier);
 			}
 		}
 		this.dbCollection = db.getCollection(XDI2_DBCOLLECTION);
-		if (Boolean.TRUE.equals(singleDatabaseFlag)) {
+		if (Boolean.TRUE.equals(sharedDatabaseFlag)) {
 			BasicDBObject idx = new BasicDBObject();
 			idx.put(XDI2_OBJ_KEY, Integer.valueOf(1));
 			idx.put(XDI2_OBJ_ID , Integer.valueOf(1));
@@ -89,7 +89,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	 */
 	private BasicDBObject getKey(Object key) {
 
-		if (this.singleDatabaseFlag) {
+		if (this.sharedDatabaseFlag) {
 			return new BasicDBObject(XDI2_OBJ_KEY, key).append(XDI2_OBJ_ID, this.identifier);
 		} else {
 			return new BasicDBObject("_id", key);

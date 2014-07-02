@@ -38,6 +38,8 @@
 
 	<bean id="graphfactory1" class="xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory">
 		<property name="host" value="localhost" />
+		<property name="hashIdentifierFlag" value="true" />
+		<property name="sharedDatabaseFlag" value="false" />
 	</bean>
 
 	<bean id="graph1" factory-bean="graphfactory1" factory-method="openGraph">

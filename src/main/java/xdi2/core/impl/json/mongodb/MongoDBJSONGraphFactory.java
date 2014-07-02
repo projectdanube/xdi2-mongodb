@@ -33,7 +33,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 	private Integer port;
 	private Boolean mockFlag;
 	private Boolean hashIdentifierFlag;
-	private Boolean singleDatabaseFlag;
+	private Boolean sharedDatabaseFlag;
 	private List<ServerAddress> replicaSet;
 	private MongoClientOptions mongoClientOptions;
 
@@ -45,7 +45,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		this.port = DEFAULT_PORT;
 		this.mockFlag = Boolean.FALSE;
 		this.hashIdentifierFlag = Boolean.FALSE;
-		this.singleDatabaseFlag = Boolean.TRUE;
+		this.sharedDatabaseFlag = Boolean.TRUE;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 			mongoClient = getMongoClient(this.getHost(), this.getPort());
 		}
 
-		JSONStore jsonStore = new MongoDBJSONStore(mongoClient, identifier, this.getMockFlag(), this.getSingleDatabaseFlag());
+		JSONStore jsonStore = new MongoDBJSONStore(mongoClient, identifier, this.getMockFlag(), this.getSharedDatabaseFlag());
 		jsonStore.init();
 
 		return jsonStore;
@@ -175,12 +175,12 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 		this.hashIdentifierFlag = hashIdentifierFlag;
 	}
 
-	public Boolean getSingleDatabaseFlag() {
-		return this.singleDatabaseFlag;
+	public Boolean getSharedDatabaseFlag() {
+		return this.sharedDatabaseFlag;
 	}
 
-	public void setSingleDatabaseFlag(Boolean singleDatabaseFlag) {
-		this.singleDatabaseFlag = singleDatabaseFlag;
+	public void setSharedDatabaseFlag(Boolean sharedDatabaseFlag) {
+		this.sharedDatabaseFlag = sharedDatabaseFlag;
 	}
 
 	/**

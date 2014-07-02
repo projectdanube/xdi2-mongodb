@@ -94,6 +94,9 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+
 		String sample = request.getParameter("sample");
 		if (sample == null) sample = "1";
 
@@ -110,6 +113,9 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
 
 		String resultFormat = request.getParameter("resultFormat");
 		String writeImplied = request.getParameter("writeImplied");

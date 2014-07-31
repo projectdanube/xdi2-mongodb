@@ -173,6 +173,75 @@
 			</activation>
 
 			<properties>
+				<packaging.type>jar</packaging.type>
+			</properties>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.1</version>
+						<executions>
+							<execution>
+								<id>execution</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<includeScope>runtime</includeScope>
+						</configuration>
+					</plugin>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.3</version>
+						<executions>
+							<execution>
+								<id>src</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<outputDirectory>${project.build.directory}/assembly</outputDirectory>
+							<descriptors>
+								<descriptor>
+									${project.basedir}/assembly-descriptor.xml
+								</descriptor>
+							</descriptors>
+							<tarLongFileMode>gnu</tarLongFileMode>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+
+			<dependencies>
+				<dependency>
+					<groupId>xdi2</groupId>
+					<artifactId>xdi2-client</artifactId>
+					<version>0.6-SNAPSHOT</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>xdi2</groupId>
+					<artifactId>xdi2-transport-http</artifactId>
+					<version>0.6-SNAPSHOT</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+
+		</profile>
+
+		<profile>
+
+			<id>war</id>
+
+			<properties>
 				<packaging.type>war</packaging.type>
 			</properties>
 
@@ -247,75 +316,6 @@
 					<artifactId>xdi2-transport-http</artifactId>
 					<version>0.6-SNAPSHOT</version>
 					<scope>compile</scope>
-				</dependency>
-			</dependencies>
-
-		</profile>
-
-		<profile>
-
-			<id>xdi2-plugin</id>
-
-			<properties>
-				<packaging.type>jar</packaging.type>
-			</properties>
-
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.1</version>
-						<executions>
-							<execution>
-								<id>execution</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<includeScope>runtime</includeScope>
-						</configuration>
-					</plugin>
-					<plugin>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.3</version>
-						<executions>
-							<execution>
-								<id>src</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<outputDirectory>${project.build.directory}/assembly</outputDirectory>
-							<descriptors>
-								<descriptor>
-									${project.basedir}/assembly-descriptor.xml
-								</descriptor>
-							</descriptors>
-							<tarLongFileMode>gnu</tarLongFileMode>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-
-			<dependencies>
-				<dependency>
-					<groupId>xdi2</groupId>
-					<artifactId>xdi2-client</artifactId>
-					<version>0.6-SNAPSHOT</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>xdi2</groupId>
-					<artifactId>xdi2-transport-http</artifactId>
-					<version>0.6-SNAPSHOT</version>
-					<scope>provided</scope>
 				</dependency>
 			</dependencies>
 

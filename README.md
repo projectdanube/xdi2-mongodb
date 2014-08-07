@@ -19,15 +19,9 @@ After that, just run
 
 To build the XDI2 plugin.
 
-### How to build as standalone web application
+### How to run as standalone web application
 
-Run
-
-    mvn clean install package -P war
-
-### How to run
-
-    mvn jetty:run
+    mvn clean install jetty:run -P war
 
 Then access the web interface at
 

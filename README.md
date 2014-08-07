@@ -17,7 +17,13 @@ After that, just run
 
     mvn clean install
 
-To build all components.
+To build the XDI2 plugin.
+
+### How to build as standalone web application
+
+Run
+
+    mvn clean install package -P war
 
 ### How to run
 
@@ -34,12 +40,6 @@ Or access the server's status page at
 Or use an XDI client to send XDI messages to
 
     http://localhost:9992/xdi/graph
-
-### How to build as XDI2 plugin
-
-Run
-
-    mvn clean install package -P xdi2-plugin
 
 ### Community
 

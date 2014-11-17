@@ -37,12 +37,12 @@ Or use an XDI client to send XDI messages to
 
 ### Maven Dependency
 
-	&lt;dependency&gt;
-	    &lt;groupId&gt;xdi2&lt;/groupId&gt;
-	    &lt;artifactId&gt;xdi2-mongodb&lt;/artifactId&gt;
-	    &lt;version&gt;${xdi2-mongodb-version}&lt;/version&gt;
-	    &lt;scope&gt;compile&lt;/scope&gt;
-	&lt;/dependency&gt;
+	<dependency>
+	    <groupId>xdi2</groupId>
+	    <artifactId>xdi2-mongodb</artifactId>
+	    <version>${xdi2-mongodb-version}</version>
+	    <scope>compile</scope>
+	</dependency>
 
 ### Community
 

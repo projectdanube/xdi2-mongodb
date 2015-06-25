@@ -162,32 +162,32 @@ public class MongoClientOptionsFactory {
         
         MongoClientOptions.Builder clientOptionsBuilder = MongoClientOptions.builder();
         
-        if (connectionsPerHost != null) {
-            clientOptionsBuilder.connectionsPerHost(connectionsPerHost);
+        if (this.connectionsPerHost != null) {
+            clientOptionsBuilder.connectionsPerHost(this.connectionsPerHost.intValue());
         }
         
-        if (connectTimeout != null) {
-            clientOptionsBuilder.connectTimeout(connectTimeout);
+        if (this.connectTimeout != null) {
+            clientOptionsBuilder.connectTimeout(this.connectTimeout.intValue());
         }
         
-        if (autoConnectRetry != null) {
-            clientOptionsBuilder.autoConnectRetry(autoConnectRetry);
+        if (this.autoConnectRetry != null) {
+            clientOptionsBuilder.autoConnectRetry(this.autoConnectRetry.booleanValue());
         }
         
-        if (maxWaitTime != null) {
-            clientOptionsBuilder.maxWaitTime(maxWaitTime);
+        if (this.maxWaitTime != null) {
+            clientOptionsBuilder.maxWaitTime(this.maxWaitTime.intValue());
         }
         
-        if (socketTimeout != null) {
-            clientOptionsBuilder.socketTimeout(socketTimeout);
+        if (this.socketTimeout != null) {
+            clientOptionsBuilder.socketTimeout(this.socketTimeout.intValue());
         }
         
-        if (maxAutoConnectRetryTime != null) {
-            clientOptionsBuilder.maxAutoConnectRetryTime(maxAutoConnectRetryTime);
+        if (this.maxAutoConnectRetryTime != null) {
+            clientOptionsBuilder.maxAutoConnectRetryTime(this.maxAutoConnectRetryTime.intValue());
         }
         
-        if (readPreference != null) {
-            switch (readPreference) {         
+        if (this.readPreference != null) {
+            switch (this.readPreference.intValue()) {         
                 case PRIMARY_READ_PREFERENCE:
                     clientOptionsBuilder.readPreference(ReadPreference.primary());
                     break;                   
@@ -210,8 +210,8 @@ public class MongoClientOptionsFactory {
         } 
             
         
-        if (writeConcern != null) {
-            switch (writeConcern) { 
+        if (this.writeConcern != null) {
+            switch (this.writeConcern.intValue()) { 
             case UNACKNOWLEDGED_WRITE_CONCERN:
                 clientOptionsBuilder.writeConcern(WriteConcern.UNACKNOWLEDGED);
                 break;                   

@@ -89,7 +89,7 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	 */
 	private BasicDBObject getKey(Object key) {
 
-		if (this.sharedDatabaseFlag) {
+		if (Boolean.TRUE.equals(this.sharedDatabaseFlag)) {
 			return new BasicDBObject(XDI2_OBJ_KEY, key).append(XDI2_OBJ_ID, this.identifier);
 		} else {
 			return new BasicDBObject("_id", key);

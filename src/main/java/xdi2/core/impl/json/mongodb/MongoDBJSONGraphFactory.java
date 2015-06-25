@@ -1,6 +1,7 @@
 package xdi2.core.impl.json.mongodb;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.List;
@@ -126,13 +127,21 @@ public class MongoDBJSONGraphFactory extends AbstractJSONGraphFactory implements
 	}
 
 	public static String hashIdentifier(String identifier) {
+
 		try {
+
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
-			return new String(Base64.encodeBase64URLSafe(digest.digest(identifier.getBytes("UTF-8"))));
+			return URLSafe(new String(Base64.encodeBase64(digest.digest(identifier.getBytes(Charset.forName("UTF-8")))), Charset.forName("UTF-8")));
 		} catch (Exception ex) {
+
 			log.error("hashIdentifier " + identifier + "failed", ex);
+			return identifier;
 		}
-		return identifier;
+	}
+
+	private static String URLSafe(String string) {
+
+		return string.replace('+', '-').replace('/', '_');
 	}
 
 	/*

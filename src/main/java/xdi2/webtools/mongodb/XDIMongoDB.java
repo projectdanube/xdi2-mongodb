@@ -21,7 +21,7 @@ import org.springframework.web.HttpRequestHandler;
 
 import xdi2.client.XDIClient;
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.client.http.XDIHttpClient;
+import xdi2.client.impl.http.XDIHttpClient;
 import xdi2.core.Graph;
 import xdi2.core.impl.json.JSONGraph;
 import xdi2.core.impl.memory.MemoryGraphFactory;
@@ -31,7 +31,7 @@ import xdi2.core.io.XDIWriter;
 import xdi2.core.io.XDIWriterRegistry;
 import xdi2.core.io.writers.XDIDisplayWriter;
 import xdi2.messaging.MessageEnvelope;
-import xdi2.messaging.MessageResult;
+import xdi2.messaging.response.MessagingResponse;
 
 public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 
@@ -138,7 +138,7 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 		XDIWriter xdiResultWriter = XDIWriterRegistry.forFormat(resultFormat, xdiResultWriterParameters);
 
 		MessageEnvelope messageEnvelope = null;
-		MessageResult messageResult = null;
+		MessagingResponse messagingResponse = null;
 
 		long start = System.currentTimeMillis();
 
@@ -159,27 +159,27 @@ public class XDIMongoDB extends HttpServlet implements HttpRequestHandler {
 
 			XDIClient client = new XDIHttpClient(endpoint);
 
-			messageResult = client.send(messageEnvelope, null);
+			messagingResponse = client.send(messageEnvelope);
 
 			// output the message result
 
 			StringWriter writer = new StringWriter();
 
-			xdiResultWriter.write(messageResult.getGraph(), writer);
+			xdiResultWriter.write(messagingResponse.getGraph(), writer);
 
 			output = StringEscapeUtils.escapeHtml(writer.getBuffer().toString());
 		} catch (Exception ex) {
 
 			if (ex instanceof Xdi2ClientException) {
 
-				messageResult = ((Xdi2ClientException) ex).getErrorMessageResult();
+				messagingResponse = ((Xdi2ClientException) ex).getMessagingResponse();
 
 				// output the message result
 
-				if (messageResult != null) {
+				if (messagingResponse != null) {
 
 					StringWriter writer2 = new StringWriter();
-					xdiResultWriter.write(messageResult.getGraph(), writer2);
+					xdiResultWriter.write(messagingResponse.getGraph(), writer2);
 					output = StringEscapeUtils.escapeHtml(writer2.getBuffer().toString());
 				}
 			}

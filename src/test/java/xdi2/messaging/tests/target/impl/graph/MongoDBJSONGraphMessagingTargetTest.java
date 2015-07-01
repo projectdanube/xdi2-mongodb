@@ -5,6 +5,7 @@ import java.io.IOException;
 import xdi2.core.Graph;
 import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
 import xdi2.core.impl.json.mongodb.MongoDBJSONStore;
+import xdi2.messaging.target.tests.impl.graph.AbstractGraphMessagingTargetTest;
 
 public class MongoDBJSONGraphMessagingTargetTest extends AbstractGraphMessagingTargetTest {
 

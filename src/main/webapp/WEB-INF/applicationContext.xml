@@ -43,7 +43,7 @@
 	</bean>
 
 	<bean id="graph1" factory-bean="graphfactory1" factory-method="openGraph">
-		<constructor-arg><value>([=]!:uuid:1111)</value></constructor-arg>
+		<constructor-arg><value>(=!:uuid:1111)</value></constructor-arg>
 	</bean>
 
 	<bean name="/graph" class="xdi2.messaging.target.impl.graph.GraphMessagingTarget">
@@ -51,7 +51,7 @@
 		<property name="interceptors">
 			<util:list>
 				<bean class="xdi2.messaging.target.interceptor.impl.BootstrapInterceptor">
-					<property name="bootstrapOwner" value="[=]!:uuid:1111" />
+					<property name="bootstrapOwner" value="=!:uuid:1111" />
 					<property name="bootstrapOwnerSynonyms">
 						<util:list>
 							<value>=alice</value>

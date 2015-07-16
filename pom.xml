@@ -144,7 +144,7 @@
 		</dependency>
 		<dependency>
 			<groupId>xdi2</groupId>
-			<artifactId>xdi2-messaging</artifactId>
+			<artifactId>xdi2-messaging-target</artifactId>
 			<version>0.8-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>

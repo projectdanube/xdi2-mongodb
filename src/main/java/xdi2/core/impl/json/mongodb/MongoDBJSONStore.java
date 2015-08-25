@@ -11,9 +11,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import xdi2.core.impl.json.AbstractJSONStore;
-import xdi2.core.impl.json.JSONStore;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -27,6 +24,9 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
+
+import xdi2.core.impl.json.AbstractJSONStore;
+import xdi2.core.impl.json.JSONStore;
 
 public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 

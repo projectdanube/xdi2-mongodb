@@ -10,13 +10,13 @@ import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import xdi2.core.GraphFactory;
-import xdi2.core.impl.json.AbstractJSONGraphFactory;
-import xdi2.core.impl.json.JSONStore;
-
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
+
+import xdi2.core.GraphFactory;
+import xdi2.core.impl.json.AbstractJSONGraphFactory;
+import xdi2.core.impl.json.JSONStore;
 
 /**
  * GraphFactory that creates JSON graphs in MongoDB.

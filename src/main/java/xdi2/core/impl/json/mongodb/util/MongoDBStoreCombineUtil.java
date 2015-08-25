@@ -4,15 +4,15 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
-import xdi2.core.impl.json.mongodb.MongoDBJSONStore;
-
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+
+import xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory;
+import xdi2.core.impl.json.mongodb.MongoDBJSONStore;
 
 /**
  * This <code>MongoDBStoreCombineUtil</code> class combines the existing

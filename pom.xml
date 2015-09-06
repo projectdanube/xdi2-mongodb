@@ -60,7 +60,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.18.1</version>
 				<configuration>
-					<workingDirectory>${basedir}/../tmp</workingDirectory>
+					<workingDirectory>${basedir}/tmp</workingDirectory>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -211,25 +211,8 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.1</version>
-						<executions>
-							<execution>
-								<id>execution</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<includeScope>runtime</includeScope>
-						</configuration>
-					</plugin>
-					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.3</version>
+						<version>2.5.5</version>
 						<executions>
 							<execution>
 								<id>src</id>

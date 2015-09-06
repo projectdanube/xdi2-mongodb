@@ -1,4 +1,4 @@
-package xdi2.messaging.tests.target.impl.graph;
+package xdi2.messaging.target.tests.impl.graph;
 
 import java.io.IOException;
 

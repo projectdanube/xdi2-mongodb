@@ -43,7 +43,7 @@
 				<executions>
 					<execution>
 						<goals>
-							<goal>jar-no-fork</goal>
+							<goal>jar</goal>
 						</goals>
 					</execution>
 				</executions>

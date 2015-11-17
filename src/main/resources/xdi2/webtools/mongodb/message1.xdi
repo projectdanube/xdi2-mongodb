@@ -1,2 +1,2 @@
-(=markus[$msg]!1$do/$set)=markus<#email>&/&/"markus.sabadello@gmail.com"
-(=markus[$msg]!1$do/$set)=markus/#friend/=drummond
+(=markus[$msg]*!:uuid:1234$do/$set)=markus<#email>&/&/"markus.sabadello@gmail.com"
+(=markus[$msg]*!:uuid:1234$do/$set)=markus/#friend/=drummond

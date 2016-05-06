@@ -5,7 +5,7 @@
 	<groupId>xdi2</groupId>
 	<artifactId>xdi2-mongodb</artifactId>
 	<packaging>${packaging.type}</packaging>
-	<version>0.8-SNAPSHOT</version>
+	<version>0.8-M4</version>
 	<name>xdi2-mongodb</name>
 
 	<issueManagement>
@@ -119,14 +119,14 @@
 		<dependency>
 			<groupId>xdi2</groupId>
 			<artifactId>xdi2-core</artifactId>
-			<version>0.8-SNAPSHOT</version>
+			<version>0.8-M4</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>xdi2</groupId>
 			<artifactId>xdi2-messaging-target</artifactId>
-			<version>0.8-SNAPSHOT</version>
+			<version>0.8-M4</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -189,13 +189,13 @@
 				<dependency>
 					<groupId>xdi2</groupId>
 					<artifactId>xdi2-client</artifactId>
-					<version>0.8-SNAPSHOT</version>
+					<version>0.8-M4</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>xdi2</groupId>
 					<artifactId>xdi2-transport-http</artifactId>
-					<version>0.8-SNAPSHOT</version>
+					<version>0.8-M4</version>
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>
@@ -279,13 +279,13 @@
 				<dependency>
 					<groupId>xdi2</groupId>
 					<artifactId>xdi2-client</artifactId>
-					<version>0.8-SNAPSHOT</version>
+					<version>0.8-M4</version>
 					<scope>compile</scope>
 				</dependency>
 				<dependency>
 					<groupId>xdi2</groupId>
 					<artifactId>xdi2-transport-http</artifactId>
-					<version>0.8-SNAPSHOT</version>
+					<version>0.8-M4</version>
 					<scope>compile</scope>
 				</dependency>
 			</dependencies>

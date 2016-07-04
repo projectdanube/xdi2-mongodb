@@ -32,8 +32,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -79,7 +79,7 @@
 				<version>2.10.3</version>
 				<configuration>
 					<notimestamp>true</notimestamp>
-					<source>1.7</source>
+					<source>1.6</source>
 					<doclet>org.jboss.apiviz.APIviz</doclet>
 					<docletArtifact>
 						<groupId>org.jboss.apiviz</groupId>

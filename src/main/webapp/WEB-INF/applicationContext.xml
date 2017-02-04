@@ -5,10 +5,10 @@
 
 	<!-- XDI ENDPOINT REGISTRY AND TRANSPORT -->
 
-	<bean id="UriMessagingTargetRegistry" class="xdi2.transport.registry.impl.uri.UriMessagingTargetRegistry" init-method="init" destroy-method="shutdown" />
+	<bean id="UriMessagingContainerRegistry" class="xdi2.transport.registry.impl.uri.UriMessagingContainerRegistry" init-method="init" destroy-method="shutdown" />
 
 	<bean id="HttpTransport" class="xdi2.transport.impl.http.HttpTransport" init-method="init" destroy-method="shutdown">
-		<property name="uriMessagingTargetRegistry" ref="UriMessagingTargetRegistry" />
+		<property name="uriMessagingContainerRegistry" ref="UriMessagingContainerRegistry" />
 		<property name="interceptors">
 			<util:list>
 				<bean class="xdi2.transport.impl.http.interceptor.impl.DebugHttpTransportInterceptor" />
@@ -34,7 +34,7 @@
 	</bean>
 
 	<!-- MESSAGING TARGET at /graph -->
-	<!-- MessagingTarget: GraphMessagingTarget backed by a MongoDBGraph -->
+	<!-- MessagingContainer: GraphMessagingContainer backed by a MongoDBGraph -->
 
 	<bean id="graphfactory1" class="xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory">
 		<property name="host" value="localhost" />
@@ -46,11 +46,11 @@
 		<constructor-arg><value>(=!:uuid:1111)</value></constructor-arg>
 	</bean>
 
-	<bean name="/graph" class="xdi2.messaging.target.impl.graph.GraphMessagingTarget">
+	<bean name="/graph" class="xdi2.messaging.container.impl.graph.GraphMessagingContainer">
 		<property name="graph" ref="graph1" />
 		<property name="interceptors">
 			<util:list>
-				<bean class="xdi2.messaging.target.interceptor.impl.BootstrapInterceptor">
+				<bean class="xdi2.messaging.container.interceptor.impl.BootstrapInterceptor">
 					<property name="bootstrapOwner" value="=!:uuid:1111" />
 					<property name="bootstrapOwnerSynonyms">
 						<util:list>
@@ -60,7 +60,7 @@
 					<property name="bootstrapRootLinkContract" value="true" />
 					<property name="bootstrapPublicLinkContract" value="true" />
 				</bean>
-				<bean class="xdi2.messaging.target.interceptor.impl.RefInterceptor" />
+				<bean class="xdi2.messaging.container.interceptor.impl.RefInterceptor" />
 			</util:list>
 		</property>
 	</bean>

@@ -33,7 +33,7 @@
 		<property name="graph" ref="graph1" />
 	</bean>
 
-	<!-- MESSAGING TARGET at /graph -->
+	<!-- MESSAGING CONTAINER at /graph -->
 	<!-- MessagingContainer: GraphMessagingContainer backed by a MongoDBGraph -->
 
 	<bean id="graphfactory1" class="xdi2.core.impl.json.mongodb.MongoDBJSONGraphFactory">

@@ -257,12 +257,14 @@ public class MongoDBJSONStore extends AbstractJSONStore implements JSONStore {
 	private String toMongoKey(String key) {
 
 		if (key.startsWith("$")) key = "\\" + key;
+		key = "-" + key;
 
 		return key;
 	}
 
 	private String fromMongoKey(String key) {
 
+		key = key.substring(1);
 		if (key.startsWith("\\$")) key = key.substring(1);
 
 		return key;
